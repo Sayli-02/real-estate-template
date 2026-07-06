@@ -1,401 +1,603 @@
-import { useState, useEffect, useRef } from "react";
-import { MapPin, ArrowUpRight, ArrowRight, Star, ChevronLeft, ChevronRight, Phone, Menu, X } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  MapPin, ArrowUpRight, ArrowRight, Star,
+  ChevronLeft, ChevronRight, Phone, Menu, X,
+  ChevronDown, ArrowUp,
+} from "lucide-react";
 
-// ─── Data ────────────────────────────────────────────────────────────────────
+// ─── Design Tokens ────────────────────────────────────────────────────────────
+const GOLD    = "#C9A96E";
+const GOLD_LT = "#E8D5B0";
+const DARK    = "#0D0D0D";
+const CHAR    = "#1A1A1A";
+const OFF_W   = "#FAF8F4";
 
+const FONT_DISPLAY  = "'Bebas Neue', sans-serif";
+const FONT_EDITORIAL = "'Cormorant Garamond', serif";
+const FONT_BODY     = "'Inter', sans-serif";
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
 const projects = [
-  {
-    id: 1,
-    title: "Horizon Residence",
-    location: "Oslo, Norway",
-    category: "Residential",
-    size: "large",
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop&auto=format",
-  },
-  {
-    id: 2,
-    title: "The Meridian Tower",
-    location: "Berlin, Germany",
-    category: "Commercial",
-    size: "small",
-    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&h=400&fit=crop&auto=format",
-  },
-  {
-    id: 3,
-    title: "Cascade House",
-    location: "Tokyo, Japan",
-    category: "Residential",
-    size: "small",
-    image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&h=400&fit=crop&auto=format",
-  },
-  {
-    id: 4,
-    title: "Vault Cultural Centre",
-    location: "London, UK",
-    category: "Cultural",
-    size: "medium",
-    image: "https://images.unsplash.com/photo-1513584684374-8bab748fbf90?w=700&h=500&fit=crop&auto=format",
-  },
-  {
-    id: 5,
-    title: "Glass Pavilion",
-    location: "Copenhagen, Denmark",
-    category: "Commercial",
-    size: "medium",
-    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=700&h=500&fit=crop&auto=format",
-  },
+  { id: 1, title: "Horizon Villa",       location: "Goa, India",          category: "Residential", image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&h=700&fit=crop&auto=format" },
+  { id: 2, title: "The Meridian Tower",  location: "Mumbai, India",       category: "Commercial",  image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=700&fit=crop&auto=format" },
+  { id: 3, title: "The Courtyard House", location: "Alibaug, India",      category: "Residential", image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&h=700&fit=crop&auto=format" },
+  { id: 4, title: "Vault Arts Centre",   location: "New Delhi, India",    category: "Cultural",    image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1200&h=700&fit=crop&auto=format" },
+  { id: 5, title: "Glass Retreat",       location: "Karjat, India",       category: "Commercial",  image: "https://images.unsplash.com/photo-1549517045-bc93de075e53?w=1200&h=700&fit=crop&auto=format" },
 ];
 
 const services = [
   {
-    num: "01",
-    title: "Architectural Design",
+    num: "01", title: "Architectural Design",
     description: "From initial concept through to construction documentation, we craft buildings that balance beauty with structural integrity and long-term livability.",
     tags: ["Concept", "Schematic Design", "Documentation", "Site Supervision"],
   },
   {
-    num: "02",
-    title: "Interior Architecture",
+    num: "02", title: "Interior Architecture",
     description: "We shape spaces from the inside out — materiality, light, proportion, and detail considered as one unified composition.",
     tags: ["Space Planning", "Materials", "Lighting Design", "Furniture"],
   },
   {
-    num: "03",
-    title: "Urban Strategy",
+    num: "03", title: "Urban Strategy",
     description: "Large-scale thinking for cities and communities: master planning, public space design, and mixed-use development that adds genuine value.",
     tags: ["Master Planning", "Mixed-Use", "Public Space", "Zoning"],
   },
   {
-    num: "04",
-    title: "Heritage & Adaptive Reuse",
+    num: "04", title: "Heritage & Adaptive Reuse",
     description: "Breathing new life into existing buildings. We specialise in sensitive interventions that preserve what matters while enabling what is needed today.",
     tags: ["Conservation", "Adaptive Reuse", "Heritage", "Restoration"],
   },
 ];
 
 const awards = [
-  { name: "European Architecture Prize", year: "2023", category: "Residential" },
-  { name: "Dezeen Awards Longlist", year: "2022", category: "Interior" },
-  { name: "Architectural Review Award", year: "2021", category: "Cultural" },
-  { name: "RIBA International Prize", year: "2020", category: "Commercial" },
-  { name: "World Architecture Festival", year: "2019", category: "Urban" },
+  { name: "European Architecture Prize",    year: "2023", category: "Residential" },
+  { name: "Dezeen Awards Longlist",         year: "2022", category: "Interior"    },
+  { name: "Architectural Review Award",     year: "2021", category: "Cultural"    },
+  { name: "RIBA International Prize",       year: "2020", category: "Commercial"  },
+  { name: "World Architecture Festival",    year: "2019", category: "Urban"       },
   { name: "AZ Award — Best New Global Voice", year: "2018", category: "Emerging" },
 ];
 
 const testimonials = [
   {
     quote: "Optik transformed our brief into something we never could have imagined ourselves — a home that feels both extraordinary and completely natural to live in.",
-    name: "Marta Lindqvist",
-    role: "Private Residential Client",
+    name: "Ananya Sen", role: "Private Residential Client (Goa)",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=600&h=700&fit=crop&auto=format",
-    avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=80&h=80&fit=crop&auto=format",
+    image:  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=500&fit=crop&crop=faces&auto=format",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop&crop=faces&auto=format",
   },
   {
     quote: "The team's understanding of how people actually use public spaces is unrivalled. The cultural centre they designed for us has become the heartbeat of our city.",
-    name: "Tomás Ferreira",
-    role: "Director, Lisbon Cultural Trust",
+    name: "Kabir Mehta", role: "Director, Delhi Arts Trust",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=700&fit=crop&auto=format",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&auto=format",
+    image:  "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=800&h=500&fit=crop&crop=faces&auto=format",
+    avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=120&h=120&fit=crop&crop=faces&auto=format",
   },
   {
     quote: "Working with Optik was a masterclass in rigour. Every detail has a reason. Every space serves a purpose. We could not be prouder of what we built together.",
-    name: "Saoirse Brennan",
-    role: "CEO, Meridian Developments",
+    name: "Vikram Malhotra", role: "CEO, Meridian Realty (Mumbai)",
     rating: 5,
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=700&fit=crop&auto=format",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&auto=format",
+    image:  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&h=500&fit=crop&crop=faces&auto=format",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=faces&auto=format",
   },
 ];
 
 const posts = [
-  {
-    date: "June 12, 2026",
-    category: "Material",
+  { date: "June 12, 2026",  category: "Material", readTime: "5 min",
     title: "Why Concrete Is Having Its Most Interesting Moment in Decades",
-    image: "https://images.unsplash.com/photo-1604754742629-3e5728249d73?w=600&h=400&fit=crop&auto=format",
-  },
-  {
-    date: "May 28, 2026",
-    category: "Process",
+    image: "https://images.unsplash.com/photo-1604754742629-3e5728249d73?w=600&h=400&fit=crop&auto=format" },
+  { date: "May 28, 2026",   category: "Process",  readTime: "7 min",
     title: "The Brief That Changed How We Think About Natural Light",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop&auto=format",
-  },
-  {
-    date: "April 14, 2026",
-    category: "Urban",
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop&auto=format" },
+  { date: "April 14, 2026", category: "Urban",    readTime: "9 min",
     title: "Density Done Right: Lessons from Three Successful Mixed-Use Projects",
-    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&h=400&fit=crop&auto=format",
-  },
+    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&h=400&fit=crop&auto=format" },
 ];
 
-const clientLogos = ["VANTA", "MERIDIAN", "HELIX CO.", "SOLVARA", "ARCFORM"];
+const clientLogos = ["VANTA","MERIDIAN","HELIX CO.","SOLVARA","ARCFORM","VEXA","NORDHAUS","STRATO"];
+const FILTERS = ["All","Residential","Commercial","Cultural"];
 
-// ─── Components ───────────────────────────────────────────────────────────────
+// ─── Global keyframes injected via <style> ────────────────────────────────────
+const GLOBAL_CSS = `
+  @keyframes marquee   { to { transform: translateX(-50%); } }
+  @keyframes fadeUp    { from { opacity:0; transform:translateY(36px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes scaleIn   { from { opacity:0; transform:scale(0.94);     } to { opacity:1; transform:scale(1);     } }
+  @keyframes clipReveal{ from { clip-path:inset(0 100% 0 0); }          to { clip-path:inset(0 0% 0 0);         } }
+  @keyframes bounceDot { 0%,100%{transform:translateY(0);opacity:.8;} 50%{transform:translateY(7px);opacity:.3;} }
+  @keyframes spinSlow  { to { transform:rotate(360deg); } }
+  @keyframes goldPulse { 0%,100%{box-shadow:0 0 0 0 rgba(201,169,110,.35);} 60%{box-shadow:0 0 0 10px rgba(201,169,110,0);} }
 
-function PillButton({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
+  .rv   { opacity:0; transform:translateY(60px) scale(0.96); transition:opacity 1.2s cubic-bezier(.16,1,.3,1), transform 1.2s cubic-bezier(.16,1,.3,1); }
+  .rv.on{ opacity:1; transform:translateY(0) scale(1); }
+  .rvL  { opacity:0; transform:translateX(-60px) scale(0.98); transition:opacity 1.2s cubic-bezier(.16,1,.3,1), transform 1.2s cubic-bezier(.16,1,.3,1); }
+  .rvL.on{ opacity:1; transform:translateX(0) scale(1); }
+  .rvR  { opacity:0; transform:translateX(60px) scale(0.98); transition:opacity 1.2s cubic-bezier(.16,1,.3,1), transform 1.2s cubic-bezier(.16,1,.3,1); }
+  .rvR.on{ opacity:1; transform:translateX(0) scale(1); }
+  .d1{transition-delay:.08s} .d2{transition-delay:.16s} .d3{transition-delay:.24s} .d4{transition-delay:.32s}
+
+  .rv-skew { opacity:0; transform:translateY(80px) skewY(3deg); transition:opacity 1.4s cubic-bezier(.16,1,.3,1), transform 1.4s cubic-bezier(.16,1,.3,1); }
+  .rv-skew.on { opacity:1; transform:translateY(0) skewY(0); }
+
+  .clip-reveal { clip-path:inset(100% 0 0 0); transition:clip-path 1.4s cubic-bezier(.16,1,.3,1); }
+  .clip-reveal.on { clip-path:inset(0 0 0 0); }
+  .clip-reveal img { transform:scale(1.18); transition:transform 1.6s cubic-bezier(.16,1,.3,1); }
+  .clip-reveal.on img { transform:scale(1); }
+
+  .hl::after{ content:''; position:absolute; bottom:-2px; left:0; width:0; height:1.5px; background:currentColor; transition:width .3s cubic-bezier(.16,1,.3,1); }
+  .hl:hover::after{ width:100%; }
+  .hl{ position:relative; }
+`;
+
+// ─── Hooks ────────────────────────────────────────────────────────────────────
+function useReveal(threshold = 0.05) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        setOn(true);
+        obs.disconnect();
+      }
+    }, { 
+      threshold,
+      rootMargin: "0px 0px -120px 0px" // Triggers when element is 120px into the viewport
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return { ref, on };
+}
+
+function useCountUp(target: number, duration = 1800, active = false) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (!active) return;
+    let t0: number | null = null;
+    const tick = (ts: number) => {
+      if (!t0) t0 = ts;
+      const p = Math.min((ts - t0) / duration, 1);
+      setN(Math.floor((1 - Math.pow(1 - p, 3)) * target));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [active, target, duration]);
+  return n;
+}
+
+// ─── Shared Components ────────────────────────────────────────────────────────
+
+/** Gold-accented section label */
+function Label({ children }: { children: string }) {
+  return (
+    <p style={{ fontFamily: FONT_BODY, color: GOLD, letterSpacing: "0.22em" }}
+       className="mb-3 text-[10px] font-semibold uppercase">
+      ◆ {children}
+    </p>
+  );
+}
+
+/** Primary CTA button — gold border + fill on hover */
+function GoldButton({ children, onClick, outline = false }: { children: React.ReactNode; onClick?: () => void; outline?: boolean }) {
   return (
     <button
-      className={`group inline-flex items-center gap-3 rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-widest transition-all duration-300 hover:scale-105 ${
-        dark
-          ? "bg-black text-white hover:bg-white hover:text-black border border-black"
-          : "bg-black text-white hover:bg-white hover:text-black border border-black"
-      }`}
+      onClick={onClick}
+      className="group inline-flex items-center gap-3 px-7 py-3.5 text-[11px] font-bold uppercase tracking-widest transition-all duration-300 hover:scale-105"
+      style={{
+        fontFamily: FONT_BODY,
+        background: outline ? "transparent" : GOLD,
+        color: outline ? GOLD : DARK,
+        border: `1.5px solid ${GOLD}`,
+        letterSpacing: "0.18em",
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLButtonElement).style.background = outline ? GOLD : "transparent";
+        (e.currentTarget as HTMLButtonElement).style.color      = outline ? DARK : GOLD;
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLButtonElement).style.background = outline ? "transparent" : GOLD;
+        (e.currentTarget as HTMLButtonElement).style.color      = outline ? GOLD : DARK;
+      }}
     >
       <span>{children}</span>
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-black group-hover:bg-black group-hover:text-white transition-colors duration-300">
-        <ArrowRight size={12} strokeWidth={2.5} />
-      </span>
+      <ArrowRight size={13} strokeWidth={2.5} />
     </button>
   );
 }
 
-function StatCounter({ value, label }: { value: string; label: string }) {
+/** Animated counter */
+function Counter({ value, suffix = "", label, active }: { value: number; suffix?: string; label: string; active: boolean }) {
+  const n = useCountUp(value, 1800, active);
   return (
-    <div className="flex flex-col gap-1">
-      <span className="font-display text-5xl font-black leading-none tracking-tight text-black">{value}</span>
-      <span className="text-xs uppercase tracking-widest text-black/50">{label}</span>
+    <div className="flex flex-col gap-1.5">
+      <span style={{ fontFamily: FONT_DISPLAY, color: GOLD, fontSize: "clamp(2.5rem,4vw,3.5rem)", letterSpacing:"0.03em" }}>
+        {n}{suffix}
+      </span>
+      <span style={{ fontFamily: FONT_BODY, color: "#666", letterSpacing:"0.18em" }} className="text-[10px] uppercase">{label}</span>
     </div>
   );
 }
 
-// ─── Sections ─────────────────────────────────────────────────────────────────
+// ─── Scroll helper (accounts for fixed header height) ───────────────────────
+function scrollToSection(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const offset = 80; // fixed header height
+  const top = el.getBoundingClientRect().top + window.scrollY - offset;
+  window.scrollTo({ top, behavior: "smooth" });
+}
 
-function Header({ menuOpen, setMenuOpen }: { menuOpen: boolean; setMenuOpen: (v: boolean) => void }) {
+const NAV_LINKS: { label: string; id: string }[] = [
+  { label: "Home",     id: "home"     },
+  { label: "About",    id: "about"    },
+  { label: "Services", id: "services" },
+  { label: "Contact",  id: "contact"  },
+];
+
+// ─── Header ───────────────────────────────────────────────────────────────────
+function Header({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void }) {
   const [scrolled, setScrolled] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const fn = () => {
+      setScrolled(window.scrollY > 60);
+      const d = document.documentElement;
+      setProgress((window.scrollY / (d.scrollHeight - d.clientHeight)) * 100 || 0);
+    };
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
   }, []);
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? "bg-[#f7f7f7]/95 backdrop-blur-sm shadow-[0_1px_0_rgba(0,0,0,0.1)]" : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-5">
-        {/* Logo */}
-        <a href="#" className="font-display text-2xl font-black uppercase tracking-[0.15em] text-black">
-          OPTIK
-        </a>
+    <>
+      {/* Gold progress bar */}
+      <div style={{ position:"fixed", top:0, left:0, height:"2.5px", width:`${progress}%`, background:`linear-gradient(90deg,${GOLD},${GOLD_LT})`, zIndex:100, transition:"width .1s linear" }} />
 
-        {/* Nav */}
-        <nav className="hidden md:flex items-center gap-10">
-          {["Home", "About", "Services", "Contact"].map((link) => (
-            <a
-              key={link}
-              href="#"
-              className="text-xs uppercase tracking-widest text-black/70 hover:text-black transition-colors duration-200 font-medium"
-            >
-              {link}
-            </a>
-          ))}
-        </nav>
+      <header style={{
+        position:"fixed", top:0, left:0, right:0, zIndex:50,
+        background: scrolled ? "rgba(13,13,13,0.92)" : "transparent",
+        backdropFilter: scrolled ? "blur(12px)" : "none",
+        borderBottom: scrolled ? `1px solid rgba(201,169,110,.12)` : "none",
+        transition: "all .4s ease",
+      }}>
+        <div className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-5">
+          <a href="#" style={{ fontFamily: FONT_DISPLAY, color: scrolled ? "#fff" : "#fff", letterSpacing:"0.2em", fontSize:"1.5rem", fontWeight:400 }}
+             className="hover:opacity-70 transition-opacity">
+            OPTIK
+          </a>
 
-        {/* CTA */}
-        <div className="hidden md:flex items-center gap-4">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-black/20 bg-black text-white">
-            <Phone size={14} />
-          </div>
-          <span className="text-xs font-medium tracking-wide text-black/60">+44 20 7946 0321</span>
-        </div>
+          <nav className="hidden md:flex items-center gap-10">
+            {NAV_LINKS.map(({ label, id }) => (
+              <a
+                key={id}
+                href={`#${id}`}
+                className="hl text-[11px] font-semibold uppercase tracking-widest transition-colors duration-200"
+                style={{ fontFamily: FONT_BODY, color: scrolled ? "rgba(255,255,255,.7)" : "rgba(255,255,255,.85)", letterSpacing:"0.18em" }}
+                onClick={e => { e.preventDefault(); scrollToSection(id); }}
+                onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = GOLD}
+                onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = scrolled ? "rgba(255,255,255,.7)" : "rgba(255,255,255,.85)"}
+              >{label}</a>
+            ))}
+          </nav>
 
-        {/* Mobile menu toggle */}
-        <button
-          className="md:hidden"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </div>
-
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div className="md:hidden bg-[#f7f7f7] border-t border-black/10 px-8 py-6 flex flex-col gap-5">
-          {["Home", "About", "Services", "Contact"].map((link) => (
-            <a key={link} href="#" className="text-sm uppercase tracking-widest font-bold">
-              {link}
-            </a>
-          ))}
-        </div>
-      )}
-    </header>
-  );
-}
-
-function Hero() {
-  return (
-    <section className="relative h-screen min-h-[700px] overflow-hidden bg-[#f7f7f7]">
-      {/* Background image */}
-      <div className="absolute inset-0">
-        <img
-          src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1800&h=1200&fit=crop&auto=format"
-          alt="Optik featured architecture project"
-          className="h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/20" />
-      </div>
-
-      {/* Overlapping DREAM STUDIO title — behind the image via z-layering trick */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 overflow-hidden pointer-events-none select-none">
-        <h1
-          className="font-display leading-[0.85] tracking-tighter text-white/10 uppercase text-[clamp(80px,14vw,200px)] whitespace-nowrap px-6"
-          style={{ fontFamily: "'Anton', sans-serif" }}
-        >
-          DREAM&nbsp;STUDIO
-        </h1>
-      </div>
-
-      {/* Foreground content */}
-      <div className="relative z-20 flex h-full flex-col justify-end pb-20 px-8 md:px-16 max-w-[1400px] mx-auto">
-        <div className="max-w-xl mb-10">
-          <p className="mb-8 text-sm leading-relaxed text-white/90 font-medium tracking-wide">
-            We are an architecture and design studio that shapes spaces with intention — from intimate residences to landmark cultural buildings. Every project begins with listening.
-          </p>
-          <PillButton>Explore Our Work</PillButton>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ClientLogos() {
-  return (
-    <section className="bg-black py-7">
-      <div className="mx-auto max-w-[1400px] px-8">
-        <div className="flex flex-wrap items-center justify-between gap-6">
-          {clientLogos.map((logo) => (
-            <span
-              key={logo}
-              className="font-display text-sm font-black uppercase tracking-[0.25em] text-white/30 hover:text-white/70 transition-colors duration-300 cursor-default"
-              style={{ fontFamily: "'Anton', sans-serif" }}
-            >
-              {logo}
+          <div className="hidden md:flex items-center gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full cursor-pointer transition-all duration-300"
+                 style={{ background: GOLD, color: DARK }}
+                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = "#fff"; }}
+                 onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = GOLD; }}>
+              <Phone size={14} />
+            </div>
+            <span style={{ fontFamily: FONT_BODY, color: "rgba(255,255,255,.55)", letterSpacing:"0.05em" }} className="text-xs">
+              +91 22 6123 4567
             </span>
-          ))}
+          </div>
+
+          <button className="md:hidden p-2" onClick={() => setOpen(!open)} aria-label="Toggle menu"
+                  style={{ color: "#fff" }}>
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
+
+        {/* Mobile dropdown */}
+        <div style={{
+          maxHeight: open ? "280px" : "0",
+          overflow: "hidden",
+          transition: "max-height .4s cubic-bezier(.16,1,.3,1)",
+          background: DARK,
+          borderTop: open ? `1px solid rgba(201,169,110,.15)` : "none",
+        }}>
+          <div className="px-8 py-6 flex flex-col gap-5">
+            {NAV_LINKS.map(({ label, id }) => (
+              <a
+                key={id}
+                href={`#${id}`}
+                style={{ fontFamily: FONT_BODY, color: "rgba(255,255,255,.7)", letterSpacing:"0.18em" }}
+                className="text-sm font-bold uppercase hover:opacity-60 transition-opacity"
+                onClick={e => { e.preventDefault(); scrollToSection(id); setOpen(false); }}
+              >{label}</a>
+            ))}
+          </div>
+        </div>
+      </header>
+    </>
+  );
+}
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+function Hero() {
+  const imgRef = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => { const t = setTimeout(() => setReady(true), 120); return () => clearTimeout(t); }, []);
+
+  useEffect(() => {
+    const fn = () => { if (imgRef.current) imgRef.current.style.transform = `translateY(${window.scrollY * 0.32}px)`; };
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+
+  return (
+    <section id="home" className="relative h-screen min-h-[700px] overflow-hidden" style={{ background: DARK }}>
+      {/* Parallax bg */}
+      <div ref={imgRef} className="absolute inset-0 scale-110">
+        <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1800&h=1200&fit=crop&auto=format"
+             alt="Hero" className="h-full w-full object-cover" />
+        <div className="absolute inset-0" style={{ background:"linear-gradient(to top, rgba(13,13,13,.85) 0%, rgba(13,13,13,.35) 50%, rgba(13,13,13,.2) 100%)" }} />
+      </div>
+
+      {/* Watermark */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 overflow-hidden pointer-events-none select-none">
+        <div style={{
+          fontFamily: FONT_DISPLAY,
+          fontSize: "clamp(80px,14vw,220px)",
+          color: "rgba(201,169,110,0.08)",
+          lineHeight: 0.85,
+          letterSpacing: "-0.02em",
+          paddingLeft: "1.5rem",
+          animation: ready ? "clipReveal 1.4s cubic-bezier(.16,1,.3,1) .5s both" : "none",
+        }}>DREAM&nbsp;STUDIO</div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-20 flex h-full flex-col justify-end pb-20 px-8 md:px-16 max-w-[1400px] mx-auto">
+        {/* Gold thin line accent */}
+        <div style={{ width:"40px", height:"2px", background:GOLD, marginBottom:"1.5rem",
+                      animation: ready ? "scaleIn .8s cubic-bezier(.16,1,.3,1) .2s both" : "none" }} />
+
+        <p style={{
+          fontFamily: FONT_EDITORIAL, color:"rgba(255,255,255,.75)", fontSize:"1rem",
+          fontStyle:"italic", lineHeight:1.8, maxWidth:"520px", marginBottom:"2rem",
+          animation: ready ? "fadeUp 1s cubic-bezier(.16,1,.3,1) .35s both" : "none",
+        }}>
+          We are an architecture and design studio that shapes spaces with intention — from intimate residences to landmark cultural buildings.
+        </p>
+
+        <div style={{ animation: ready ? "fadeUp 1s cubic-bezier(.16,1,.3,1) .5s both" : "none" }}>
+          <GoldButton onClick={() => scrollToSection("portfolio")}>Explore Our Work</GoldButton>
+        </div>
+
+        {/* Floating card */}
+        <div className="absolute bottom-16 right-8 md:right-16 hidden md:block"
+             style={{ animation: ready ? "scaleIn 1s cubic-bezier(.16,1,.3,1) .8s both" : "none" }}>
+          <div style={{
+            background:"rgba(13,13,13,.7)", backdropFilter:"blur(12px)",
+            border:`1px solid rgba(201,169,110,.25)`, padding:"1.25rem", width:"230px",
+          }}>
+            <p style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"9px", letterSpacing:"0.22em" }} className="uppercase mb-2">◆ Featured Project</p>
+            <p style={{ fontFamily:FONT_DISPLAY, color:"#fff", fontSize:"1.1rem", letterSpacing:"0.08em" }}>Horizon Residence</p>
+            <div className="flex items-center gap-1.5 mt-1">
+              <MapPin size={10} style={{ color: GOLD }} />
+              <span style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.5)", fontSize:"11px" }}>Goa, India</span>
+            </div>
+            <a href="#portfolio" onClick={e => { e.preventDefault(); scrollToSection("portfolio"); }} className="mt-3 flex items-center gap-2 group"
+               style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"11px", fontWeight:600, letterSpacing:"0.1em" }}>
+              View Project <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1.5">
+        <span style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.4)", fontSize:"9px", letterSpacing:"0.22em" }} className="uppercase">Scroll</span>
+        {[0,1,2].map(i => (
+          <div key={i} style={{ width:"1.5px", height:"6px", background: GOLD, borderRadius:"2px", opacity:0.6,
+                                animation:`bounceDot 1.4s ease-in-out ${i*0.18}s infinite` }} />
+        ))}
+        <ChevronDown size={14} style={{ color: GOLD, animation:"bounceDot 1.4s ease-in-out .54s infinite" }} />
+      </div>
+    </section>
+  );
+}
+
+// ─── Client Logos ─────────────────────────────────────────────────────────────
+function ClientLogos() {
+  const doubled = [...clientLogos, ...clientLogos];
+  return (
+    <section style={{ background: CHAR, borderTop:`1px solid rgba(201,169,110,.12)`, borderBottom:`1px solid rgba(201,169,110,.12)` }}
+             className="py-6 overflow-hidden">
+      <div className="flex items-center gap-0">
+        <div className="shrink-0 pl-8 pr-10" style={{ borderRight:`1px solid rgba(201,169,110,.2)` }}>
+          <p style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"9px", letterSpacing:"0.25em" }} className="uppercase whitespace-nowrap">Trusted By</p>
+        </div>
+        <div className="relative overflow-hidden flex-1">
+          <div style={{ display:"flex", gap:"4rem", whiteSpace:"nowrap", width:"max-content",
+                        animation:"marquee 22s linear infinite" }}>
+            {doubled.map((logo, i) => (
+              <span key={i} style={{ fontFamily:FONT_DISPLAY, color:"rgba(255,255,255,.2)", fontSize:"0.85rem", letterSpacing:"0.25em" }}
+                    className="cursor-default transition-all duration-300"
+                    onMouseEnter={e => (e.currentTarget as HTMLSpanElement).style.color = GOLD}
+                    onMouseLeave={e => (e.currentTarget as HTMLSpanElement).style.color = "rgba(255,255,255,.2)"}>
+                {logo}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
+// ─── About ────────────────────────────────────────────────────────────────────
 function About() {
+  const { ref, on } = useReveal(0.2);
+  const [statsOn, setStatsOn] = useState(false);
+  const sRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = sRef.current; if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setStatsOn(true); obs.disconnect(); } }, { threshold:0.3 });
+    obs.observe(el); return () => obs.disconnect();
+  }, []);
+
   return (
-    <section className="py-28 bg-[#f7f7f7]">
+    <section id="about" style={{ background: OFF_W }} className="py-32">
       <div className="mx-auto max-w-[1400px] px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-          {/* Left: text */}
-          <div className="flex flex-col gap-10">
+        <div ref={ref as React.RefObject<HTMLDivElement>} className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+
+          {/* Left */}
+          <div className={`flex flex-col gap-10 rvL ${on?"on":""}`}>
             <div>
-              <p className="mb-3 text-xs uppercase tracking-widest text-black/40 font-medium">About Us</p>
-              <h2
-                className="font-display text-[clamp(48px,6vw,90px)] leading-[0.9] tracking-tight uppercase text-black"
-                style={{ fontFamily: "'Anton', sans-serif" }}
-              >
-                Building<br />Ideas Into<br />Reality
+              <Label>About Us</Label>
+              <h2 style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(52px,6vw,96px)", color:DARK, lineHeight:0.9, letterSpacing:"0.02em" }}>
+                Building<br/>Ideas Into<br/>
+                <span style={{ color:GOLD }}>Reality</span>
               </h2>
             </div>
-            <p className="text-sm leading-7 text-black/60 max-w-sm">
+            <p style={{ fontFamily:FONT_BODY, color:"#555", lineHeight:1.9, fontSize:"0.875rem", maxWidth:"380px" }}>
               Founded in 2007, Optik has grown from a two-person practice into a studio of over sixty designers, architects, and urban thinkers. We are drawn to complexity — projects that require invention, not formula.
             </p>
-            <a
-              href="#"
-              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black border-b border-black pb-0.5 w-fit hover:opacity-50 transition-opacity"
-            >
-              More About Us <ArrowUpRight size={14} />
+            <a href="#" className="hl inline-flex items-center gap-2 w-fit"
+               style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"11px", fontWeight:700, letterSpacing:"0.18em" }}
+               onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.opacity="0.6"}
+               onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.opacity="1"}>
+              MORE ABOUT US <ArrowUpRight size={14} />
             </a>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 pt-8 border-t border-black/10">
-              <StatCounter value="17" label="Years of practice" />
-              <StatCounter value="67+" label="Studio members" />
-              <StatCounter value="1M+" label="Clients worldwide" />
+            <div ref={sRef as React.RefObject<HTMLDivElement>}
+                 className="grid grid-cols-3 gap-8 pt-8"
+                 style={{ borderTop:`1px solid rgba(0,0,0,.1)` }}>
+              <Counter value={17}  label="Years of practice" active={statsOn} />
+              <Counter value={67}  suffix="+" label="Studio members"   active={statsOn} />
+              <Counter value={120} suffix="+" label="Projects built"   active={statsOn} />
             </div>
           </div>
 
-          {/* Right: stacked images */}
-          <div className="relative flex flex-col gap-4">
-            <div className="relative overflow-hidden bg-black/5">
-              <img
-                src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=700&h=450&fit=crop&auto=format"
-                alt="Studio interior"
-                className="w-full object-cover h-64 lg:h-80"
-              />
+          {/* Right */}
+          <div className={`relative flex flex-col gap-4 rvR ${on?"on":""}`}>
+            {/* Est badge */}
+            <div style={{ position:"absolute", top:"-1.5rem", left:"-1.5rem", zIndex:10,
+                          width:"80px", height:"80px", borderRadius:"50%", background:GOLD,
+                          display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+                          border:`4px solid ${OFF_W}`, animation:"goldPulse 2.5s infinite" }}>
+              <span style={{ fontFamily:FONT_BODY, color:DARK, fontSize:"8px", letterSpacing:"0.1em", fontWeight:600 }}>Est.</span>
+              <span style={{ fontFamily:FONT_DISPLAY, color:DARK, fontSize:"1.3rem" }}>2007</span>
             </div>
-            <div className="relative overflow-hidden bg-black/5 ml-12">
-              <img
-                src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=700&h=350&fit=crop&auto=format"
-                alt="Architecture project detail"
-                className="w-full object-cover h-48 lg:h-60"
-              />
-              {/* Expand icon */}
-              <button className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg hover:bg-black hover:text-white transition-colors duration-300">
+
+            <div className={`clip-reveal group relative ${on ? "on" : ""}`}>
+              <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=700&h=450&fit=crop&auto=format"
+                   alt="Studio interior" className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                   style={{ height:"320px" }} />
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                   style={{ background:"linear-gradient(to top,rgba(13,13,13,.5),transparent)" }} />
+            </div>
+            <div className={`clip-reveal group relative ml-12 ${on ? "on" : ""}`}>
+              <img src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=700&h=350&fit=crop&auto=format"
+                   alt="Architecture detail" className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                   style={{ height:"220px" }} />
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                   style={{ background:"linear-gradient(to top,rgba(13,13,13,.5),transparent)" }} />
+              <button className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+                      style={{ background:"#fff", color:DARK }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background=GOLD; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background="#fff"; }}>
                 <ArrowUpRight size={16} />
               </button>
             </div>
           </div>
+
         </div>
       </div>
     </section>
   );
 }
 
+// ─── Portfolio ────────────────────────────────────────────────────────────────
 function Portfolio() {
+  const [filter, setFilter] = useState("All");
+  const { ref, on } = useReveal(0.1);
+  const filtered = filter === "All" ? projects : projects.filter(p => p.category === filter);
+
   return (
-    <section className="py-28 bg-white">
-      <div className="mx-auto max-w-[1400px] px-8">
-        {/* Heading */}
-        <div className="flex items-end justify-between mb-14">
+    <section id="portfolio" style={{ background:"#fff" }} className="py-32 overflow-hidden">
+      <div ref={ref as React.RefObject<HTMLDivElement>} className="mx-auto max-w-[1400px] px-8">
+        {/* Header */}
+        <div className={`flex items-end justify-between mb-10 rv-skew ${on ? "on" : ""}`}>
           <div>
-            <p className="mb-3 text-xs uppercase tracking-widest text-black/40 font-medium">Selected Work</p>
-            <h2
-              className="font-display text-[clamp(44px,5.5vw,80px)] leading-[0.9] tracking-tight uppercase"
-              style={{ fontFamily: "'Anton', sans-serif" }}
-            >
-              Portfolio
+            <Label>Selected Work</Label>
+            <h2 style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(48px,5.5vw,84px)", color:DARK, lineHeight:0.9, letterSpacing:"0.02em" }}>
+              Port<span style={{ color:GOLD }}>folio</span>
             </h2>
           </div>
-          <a href="#" className="hidden md:inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-black border-b border-black pb-0.5 hover:opacity-50 transition-opacity">
-            View All Projects <ArrowUpRight size={14} />
+          <a href="#" className="hl hidden md:inline-flex items-center gap-2"
+             style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"11px", fontWeight:700, letterSpacing:"0.18em" }}>
+            View All <ArrowUpRight size={14} />
           </a>
         </div>
 
+        {/* Filter tabs */}
+        <div className="flex flex-wrap items-center gap-2 mb-10">
+          {FILTERS.map(f => (
+            <button key={f} onClick={() => setFilter(f)}
+                    style={{
+                      fontFamily:FONT_BODY, fontSize:"11px", fontWeight:700, letterSpacing:"0.16em",
+                      padding:"0.5rem 1.25rem", borderRadius:"2px",
+                      border:`1.5px solid ${filter===f ? GOLD : "rgba(0,0,0,.15)"}`,
+                      background: filter===f ? GOLD : "transparent",
+                      color: filter===f ? DARK : "#666",
+                      transition:"all .25s ease",
+                    }}
+                    onMouseEnter={e => { if (filter!==f) { (e.currentTarget as HTMLButtonElement).style.borderColor=GOLD; (e.currentTarget as HTMLButtonElement).style.color=GOLD; } }}
+                    onMouseLeave={e => { if (filter!==f) { (e.currentTarget as HTMLButtonElement).style.borderColor="rgba(0,0,0,.15)"; (e.currentTarget as HTMLButtonElement).style.color="#666"; } }}>
+              {f}
+            </button>
+          ))}
+        </div>
+
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-black/10">
-          {projects.map((project, i) => (
-            <div
-              key={project.id}
-              className={`group relative overflow-hidden bg-[#f7f7f7] ${i === 0 ? "lg:col-span-2 lg:row-span-1" : ""}`}
-            >
-              <div className={`overflow-hidden ${i === 0 ? "h-72 lg:h-96" : "h-56 lg:h-72"}`}>
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+             style={{ gap:"1px", background:"rgba(0,0,0,.08)" }}>
+          {filtered.map((p, i) => (
+            <div key={p.id}
+                 className={`group relative overflow-hidden rv ${on?"on":""} d${Math.min(i+1,4)} ${i===0 && filter==="All" ? "lg:col-span-2":""}`}
+                 style={{ background:OFF_W }}>
+              <div className={`clip-reveal ${on ? "on" : ""}`} style={{ height: i===0 && filter==="All" ? "380px" : "270px" }}>
+                <img src={p.image} alt={p.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                {/* Hover overlay */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-400"
+                     style={{ background:"rgba(13,13,13,.72)" }}>
+                  <span style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"10px", letterSpacing:"0.22em",
+                                 border:`1px solid ${GOLD}`, padding:"0.3rem 1rem" }} className="uppercase">
+                    {p.category}
+                  </span>
+                  <a href="#" style={{ fontFamily:FONT_DISPLAY, color:"#fff", fontSize:"1.1rem", letterSpacing:"0.1em" }}
+                     className="flex items-center gap-2 hover:opacity-70 transition-opacity">
+                    View Project <ArrowUpRight size={16} />
+                  </a>
+                </div>
               </div>
-              <div className="p-5 flex items-start justify-between border-t border-black/10">
+              <div className="p-5 flex items-start justify-between" style={{ borderTop:"1px solid rgba(0,0,0,.08)" }}>
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <MapPin size={11} className="text-black/40" />
-                    <span className="text-xs text-black/40 tracking-wide">{project.location}</span>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <MapPin size={11} style={{ color:GOLD }} />
+                    <span style={{ fontFamily:FONT_BODY, color:"#888", fontSize:"11px" }}>{p.location}</span>
                   </div>
-                  <h3 className="text-sm font-bold uppercase tracking-wide">{project.title}</h3>
-                  <span className="text-xs text-black/40 mt-1 block">{project.category}</span>
+                  <h3 style={{ fontFamily:FONT_BODY, color:DARK, fontWeight:700, fontSize:"13px", letterSpacing:"0.05em", textTransform:"uppercase" }}>{p.title}</h3>
+                  <span style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"10px", letterSpacing:"0.15em" }} className="uppercase mt-1 block">{p.category}</span>
                 </div>
-                <div className="flex flex-col gap-2 text-right">
-                  <a href="#" className="text-xs font-bold uppercase tracking-widest underline underline-offset-2 hover:opacity-50 transition-opacity">
-                    See Project
-                  </a>
-                  <a href="#" className="text-xs text-black/40 hover:text-black transition-colors">
-                    About Us
-                  </a>
-                </div>
+                <a href="#" style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"10px", fontWeight:700, letterSpacing:"0.15em" }}
+                   className="hl uppercase hover:opacity-60 transition-opacity">See Project</a>
               </div>
             </div>
           ))}
@@ -405,212 +607,301 @@ function Portfolio() {
   );
 }
 
+// ─── Services ─────────────────────────────────────────────────────────────────
 function Services() {
   const [active, setActive] = useState(0);
+  const { ref, on } = useReveal(0.1);
 
-  const serviceImages = [
-    "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=700&h=500&fit=crop&auto=format",
-    "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=700&h=500&fit=crop&auto=format",
-    "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=700&h=500&fit=crop&auto=format",
-    "https://images.unsplash.com/photo-1513584684374-8bab748fbf90?w=700&h=500&fit=crop&auto=format",
+  const imgs = [
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=700&h=600&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=700&h=600&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=700&h=600&fit=crop&auto=format",
+    "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=700&h=600&fit=crop&auto=format",
   ];
 
   return (
-    <section className="py-28 bg-[#f7f7f7]">
+    <section id="services" style={{ background: DARK }} className="py-32">
       <div className="mx-auto max-w-[1400px] px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          {/* Left: rows */}
-          <div>
-            <p className="mb-3 text-xs uppercase tracking-widest text-black/40 font-medium">What We Do</p>
-            <h2
-              className="font-display text-[clamp(44px,5vw,72px)] leading-[0.9] tracking-tight uppercase mb-12"
-              style={{ fontFamily: "'Anton', sans-serif" }}
-            >
-              Our<br />Services
+        <div ref={ref as React.RefObject<HTMLDivElement>} className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+
+          {/* Left */}
+          <div className={`rvL ${on?"on":""}`}>
+            <Label>What We Do</Label>
+            <h2 style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(48px,5vw,76px)", color:"#fff", lineHeight:0.9, letterSpacing:"0.02em", marginBottom:"3rem" }}>
+              Our<br/><span style={{ color:GOLD }}>Services</span>
             </h2>
 
             <div className="flex flex-col">
-              {services.map((service, i) => (
-                <button
-                  key={service.num}
-                  onClick={() => setActive(i)}
-                  className={`group text-left border-t border-black/10 py-7 transition-all duration-300 ${
-                    i === active ? "border-black/40" : ""
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-5">
-                      <span className={`text-xs font-bold tracking-widest transition-colors duration-200 ${i === active ? "text-black" : "text-black/30"}`}>
-                        {service.num}
-                      </span>
-                      <div>
-                        <h3 className={`text-base font-bold uppercase tracking-wide mb-2 transition-colors ${i === active ? "text-black" : "text-black/50"}`}>
-                          {service.title}
-                        </h3>
-                        {i === active && (
-                          <div>
-                            <p className="text-xs leading-6 text-black/50 mb-4 max-w-xs">{service.description}</p>
-                            <div className="flex flex-wrap gap-2">
-                              {service.tags.map((tag) => (
-                                <span key={tag} className="rounded-full border border-black/20 px-3 py-1 text-xs text-black/60 tracking-wide">
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
+              {services.map((svc, i) => {
+                const isActive = i === active;
+                return (
+                  <button key={svc.num} onClick={() => setActive(i)}
+                          className="text-left w-full"
+                          style={{
+                            borderTop:`1px solid ${isActive ? GOLD+"55" : "rgba(255,255,255,.08)"}`,
+                            padding:"1.5rem 0",
+                            background:"transparent",
+                          }}>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-5 flex-1">
+                        {/* Number */}
+                        <span style={{ fontFamily:FONT_DISPLAY, fontSize:"1.6rem", color: isActive ? GOLD : "rgba(255,255,255,.2)", letterSpacing:"0.05em", minWidth:"2.5rem" }}>
+                          {svc.num}
+                        </span>
+                        <div className="flex-1">
+                          {/* Title — always visible */}
+                          <h3 style={{ fontFamily:FONT_BODY, fontWeight:700, fontSize:"0.9rem", letterSpacing:"0.08em",
+                                       color: isActive ? "#fff" : "rgba(255,255,255,.45)", textTransform:"uppercase",
+                                       marginBottom:"0.75rem", transition:"color .3s" }}>
+                            {svc.title}
+                          </h3>
+
+                          {/* Description — ALWAYS VISIBLE, just dimmed when inactive */}
+                          <p style={{ fontFamily:FONT_BODY, fontSize:"0.8rem", lineHeight:1.75,
+                                      color: isActive ? "rgba(255,255,255,.65)" : "rgba(255,255,255,.25)",
+                                      maxWidth:"340px", marginBottom:"1rem", transition:"color .3s" }}>
+                            {svc.description}
+                          </p>
+
+                          {/* Tags — always visible, styled by active state */}
+                          <div className="flex flex-wrap gap-2">
+                            {svc.tags.map(tag => (
+                              <span key={tag} style={{
+                                fontFamily:FONT_BODY, fontSize:"10px", letterSpacing:"0.12em",
+                                border:`1px solid ${isActive ? GOLD+"60" : "rgba(255,255,255,.1)"}`,
+                                color: isActive ? GOLD : "rgba(255,255,255,.25)",
+                                padding:"0.2rem 0.75rem", borderRadius:"2px",
+                                transition:"all .3s",
+                              }} className="uppercase">{tag}</span>
+                            ))}
                           </div>
-                        )}
+                        </div>
                       </div>
+                      <ArrowUpRight size={16} style={{
+                        color: isActive ? GOLD : "rgba(255,255,255,.2)",
+                        transform: isActive ? "rotate(0deg)" : "rotate(-45deg)",
+                        transition:"all .3s", flexShrink:0, marginTop:"0.125rem",
+                      }} />
                     </div>
-                    <ArrowUpRight
-                      size={16}
-                      className={`shrink-0 mt-0.5 transition-all duration-300 ${i === active ? "opacity-100 rotate-0" : "opacity-20 -rotate-45"}`}
-                    />
-                  </div>
-                </button>
-              ))}
-              <div className="border-t border-black/10" />
+                  </button>
+                );
+              })}
+              <div style={{ borderTop:"1px solid rgba(255,255,255,.08)" }} />
             </div>
           </div>
 
-          {/* Right: rotating image */}
-          <div className="relative hidden lg:block">
-            <div className="sticky top-28 overflow-hidden bg-black/5 h-[520px]">
-              <img
-                src={serviceImages[active]}
-                alt={services[active].title}
-                className="h-full w-full object-cover transition-opacity duration-500"
-                key={active}
-              />
+          {/* Right: crossfade image */}
+          <div className={`hidden lg:block rvR ${on?"on":""}`}>
+            <div className={`clip-reveal sticky top-28 ${on ? "on" : ""}`} style={{ height:"620px" }}>
+              {imgs.map((src, i) => (
+                <img key={i} src={src} alt={services[i].title}
+                     className="absolute inset-0 h-full w-full object-cover"
+                     style={{ opacity: i===active ? 1 : 0, transition:"opacity .7s ease" }} />
+              ))}
+              <div className="absolute inset-0 pointer-events-none"
+                   style={{ background:"linear-gradient(to top, rgba(13,13,13,.6) 0%, transparent 50%)" }} />
+              {/* Active label on image */}
+              <div className="absolute bottom-6 left-6">
+                <p style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"9px", letterSpacing:"0.22em" }} className="uppercase mb-1">◆ Active</p>
+                <p style={{ fontFamily:FONT_DISPLAY, color:"#fff", fontSize:"1.4rem", letterSpacing:"0.06em" }}>
+                  {services[active].title}
+                </p>
+              </div>
             </div>
           </div>
+
         </div>
       </div>
     </section>
   );
 }
 
+// ─── Awards ───────────────────────────────────────────────────────────────────
 function Awards() {
+  const { ref, on } = useReveal(0.1);
+
   return (
-    <section className="py-28 bg-black text-white">
+    <section id="awards" style={{ background:"#111", borderTop:`1px solid rgba(201,169,110,.12)` }} className="py-32">
       <div className="mx-auto max-w-[1400px] px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-          {/* Left: images */}
-          <div className="flex flex-col gap-4">
-            <div className="overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=700&h=420&fit=crop&auto=format"
-                alt="Award winning project"
-                className="w-full h-64 object-cover hover:scale-105 transition-transform duration-700"
-              />
+        <div ref={ref as React.RefObject<HTMLDivElement>} className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+
+          {/* Left */}
+          <div className={`flex flex-col gap-4 rvL ${on?"on":""}`}>
+            <div className={`clip-reveal group ${on ? "on" : ""}`}>
+              <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=700&h=420&fit=crop&auto=format"
+                   alt="Award winning project"
+                   className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
+                   style={{ height:"260px" }} />
             </div>
-            <div className="overflow-hidden ml-16">
-              <img
-                src="https://images.unsplash.com/photo-1604754742629-3e5728249d73?w=600&h=300&fit=crop&auto=format"
-                alt="Architecture detail"
-                className="w-full h-44 object-cover hover:scale-105 transition-transform duration-700"
-              />
+            <div className={`clip-reveal ml-16 group ${on ? "on" : ""}`}>
+              <img src="https://images.unsplash.com/photo-1604754742629-3e5728249d73?w=600&h=300&fit=crop&auto=format"
+                   alt="Architecture detail"
+                   className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
+                   style={{ height:"180px" }} />
             </div>
 
-            {/* 17 years badge */}
+            {/* Spinning badge */}
             <div className="flex items-center gap-5 mt-4 ml-4">
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-2 border-white/20">
-                <div className="text-center">
-                  <div className="font-display text-2xl font-black leading-none" style={{ fontFamily: "'Anton', sans-serif" }}>17</div>
-                  <div className="text-[9px] uppercase tracking-widest text-white/50 leading-tight">Years</div>
+              <div style={{ position:"relative", width:"80px", height:"80px", flexShrink:0 }}>
+                <svg className="absolute inset-0 w-full h-full" style={{ animation:"spinSlow 10s linear infinite" }} viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="36" fill="none" stroke={GOLD} strokeWidth="1" strokeDasharray="5 9" strokeLinecap="round" strokeOpacity="0.5" />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span style={{ fontFamily:FONT_DISPLAY, color:GOLD, fontSize:"1.6rem", lineHeight:1 }}>17</span>
+                  <span style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.4)", fontSize:"8px", letterSpacing:"0.15em" }} className="uppercase">Yrs</span>
                 </div>
               </div>
-              <div>
-                <p className="text-xs text-white/50 leading-relaxed italic">
-                  "Architecture is not about buildings. It is about people and how they inhabit space."
-                </p>
-                <p className="mt-2 text-xs font-bold tracking-widest uppercase text-white/30">— K. Sørenssen, Founder</p>
-              </div>
+              <p style={{ fontFamily:FONT_EDITORIAL, color:"rgba(255,255,255,.55)", fontSize:"0.9rem", fontStyle:"italic", lineHeight:1.7 }}>
+                "Architecture is not about buildings. It is about people and how they inhabit space."
+                <br/>
+                <span style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.3)", fontSize:"10px", letterSpacing:"0.15em", fontStyle:"normal" }}>
+                  — Kabir Sharma, Founder
+                </span>
+              </p>
             </div>
           </div>
 
-          {/* Right: table */}
-          <div>
-            <p className="mb-3 text-xs uppercase tracking-widest text-white/30 font-medium">Recognition</p>
-            <h2
-              className="font-display text-[clamp(44px,5vw,72px)] leading-[0.9] tracking-tight uppercase mb-12"
-              style={{ fontFamily: "'Anton', sans-serif" }}
-            >
-              Awards &<br />Honours
+          {/* Right */}
+          <div className={`rvR ${on?"on":""}`}>
+            <Label>Recognition</Label>
+            <h2 style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(48px,5vw,76px)", color:"#fff", lineHeight:0.9, letterSpacing:"0.02em", marginBottom:"3rem" }}>
+              Awards &<br/><span style={{ color:GOLD }}>Honours</span>
             </h2>
 
             <div className="flex flex-col">
-              {awards.map((award, i) => (
-                <div key={i} className="grid grid-cols-[1fr_auto_auto] gap-6 py-5 border-t border-white/10 items-center">
-                  <span className="text-sm font-medium leading-tight">{award.name}</span>
-                  <span className="text-xs text-white/40 tabular-nums">{award.year}</span>
-                  <span className="rounded-full border border-white/20 px-3 py-1 text-xs text-white/40 tracking-wide">{award.category}</span>
+              {awards.map((aw, i) => (
+                <div key={i}
+                     className="group grid items-center gap-6 -mx-4 px-4 rounded-sm cursor-default transition-all duration-200"
+                     style={{
+                       gridTemplateColumns:"1fr auto auto",
+                       padding:"1.25rem 1rem",
+                       borderTop:"1px solid rgba(255,255,255,.07)",
+                       opacity: on ? 1 : 0,
+                       transform: on ? "translateX(0)" : "translateX(24px)",
+                       transition:`opacity .6s cubic-bezier(.16,1,.3,1) ${.1+i*.09}s, transform .6s cubic-bezier(.16,1,.3,1) ${.1+i*.09}s, background .2s`,
+                     }}
+                     onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background="rgba(201,169,110,.05)"}
+                     onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background="transparent"}>
+                  <span style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.75)", fontSize:"13px", fontWeight:500 }}
+                        className="group-hover:text-white transition-colors">{aw.name}</span>
+                  <span style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.3)", fontSize:"12px" }}>{aw.year}</span>
+                  <span style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"9px", letterSpacing:"0.15em",
+                                 border:`1px solid ${GOLD}40`, padding:"0.2rem 0.7rem" }} className="uppercase">
+                    {aw.category}
+                  </span>
                 </div>
               ))}
-              <div className="border-t border-white/10" />
+              <div style={{ borderTop:"1px solid rgba(255,255,255,.07)" }} />
             </div>
           </div>
+
         </div>
       </div>
     </section>
   );
 }
 
+// ─── Testimonials ─────────────────────────────────────────────────────────────
 function Testimonials() {
-  const [current, setCurrent] = useState(0);
-  const prev = () => setCurrent((c) => (c - 1 + testimonials.length) % testimonials.length);
-  const next = () => setCurrent((c) => (c + 1) % testimonials.length);
-  const t = testimonials[current];
+  const [cur, setCur] = useState(0);
+  const [fading, setFading] = useState(false);
+  const { ref, on } = useReveal(0.15);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const go = useCallback((next: number) => {
+    if (fading) return;
+    setFading(true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setTimeout(() => { setCur(next); setFading(false); }, 320);
+  }, [fading]);
+
+  useEffect(() => {
+    timerRef.current = setTimeout(() => go((cur + 1) % testimonials.length), 5500);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [cur, go]);
+
+  const t = testimonials[cur];
 
   return (
-    <section className="py-28 bg-[#f7f7f7]">
+    <section style={{ background: OFF_W }} className="py-32">
       <div className="mx-auto max-w-[1400px] px-8">
-        <p className="mb-10 text-xs uppercase tracking-widest text-black/40 font-medium">Client Voices</p>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-stretch overflow-hidden border border-black/10">
+        <Label>Client Voices</Label>
+
+        <div ref={ref as React.RefObject<HTMLDivElement>}
+             className={`grid grid-cols-1 lg:grid-cols-2 overflow-hidden rv ${on?"on":""}`}
+             style={{ border:`1px solid rgba(0,0,0,.08)` }}>
           {/* Image */}
-          <div className="overflow-hidden bg-black/5 h-72 lg:h-auto">
-            <img
-              key={current}
-              src={t.image}
-              alt={t.name}
-              className="h-full w-full object-cover object-top transition-opacity duration-500"
-            />
+          <div className={`clip-reveal ${on ? "on" : ""}`} style={{ height:"380px" }}>
+            <img src={t.image} alt={t.name}
+                 className="h-full w-full object-cover object-center"
+                 style={{ opacity: fading ? 0 : 1, transform: fading ? "scale(1.04)" : "scale(1)", transition:"opacity .35s ease, transform .35s ease" }} />
           </div>
 
-          {/* Quote */}
-          <div className="flex flex-col justify-between p-10 lg:p-14 bg-white">
-            <div>
-              <div className="flex gap-1 mb-8">
+          {/* Quote panel */}
+          <div className="flex flex-col justify-between p-10 lg:p-14" style={{ background:"#fff" }}>
+            {/* Decorative " */}
+            <div style={{ fontFamily:FONT_EDITORIAL, fontSize:"9rem", lineHeight:1, color:GOLD+"18",
+                          position:"absolute", top:"1rem", right:"2.5rem", pointerEvents:"none", userSelect:"none" }}>
+              "
+            </div>
+
+            <div style={{ position:"relative" }}>
+              {/* Stars */}
+              <div className="flex gap-1 mb-6">
                 {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} size={14} fill="black" stroke="none" />
+                  <Star key={i} size={14} style={{ fill:GOLD, stroke:"none" }} />
                 ))}
               </div>
-              <p className="text-base lg:text-lg leading-8 font-medium text-black mb-10">
+              <p style={{
+                fontFamily:FONT_EDITORIAL, fontSize:"clamp(1rem,1.4vw,1.2rem)", lineHeight:1.8,
+                fontStyle:"italic", color:DARK, marginBottom:"2rem",
+                opacity: fading ? 0 : 1, transform: fading ? "translateY(8px)" : "translateY(0)",
+                transition:"opacity .3s ease, transform .3s ease",
+              }}>
                 "{t.quote}"
               </p>
               <div className="flex items-center gap-4">
-                <img src={t.avatar} alt={t.name} className="h-12 w-12 rounded-full object-cover object-top" />
+                <img src={t.avatar} alt={t.name} className="h-12 w-12 rounded-full object-cover object-center"
+                     style={{ boxShadow:`0 0 0 2px ${GOLD}` }} />
                 <div>
-                  <p className="text-sm font-bold uppercase tracking-wide">{t.name}</p>
-                  <p className="text-xs text-black/40 mt-0.5">{t.role}</p>
+                  <p style={{ fontFamily:FONT_BODY, fontWeight:700, fontSize:"13px", letterSpacing:"0.06em", color:DARK, textTransform:"uppercase" }}>{t.name}</p>
+                  <p style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"11px", letterSpacing:"0.1em" }}>{t.role}</p>
                 </div>
               </div>
             </div>
 
             {/* Controls */}
-            <div className="flex items-center gap-4 mt-12">
-              <button
-                onClick={prev}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-black/20 hover:bg-black hover:text-white hover:border-black transition-all duration-200"
-              >
+            <div className="flex items-center gap-3 mt-10">
+              <button onClick={() => go((cur - 1 + testimonials.length) % testimonials.length)}
+                      className="flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
+                      style={{ border:`1.5px solid rgba(0,0,0,.15)` }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor=GOLD; (e.currentTarget as HTMLButtonElement).style.background=GOLD; (e.currentTarget as HTMLButtonElement).style.color=DARK; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor="rgba(0,0,0,.15)"; (e.currentTarget as HTMLButtonElement).style.background="transparent"; (e.currentTarget as HTMLButtonElement).style.color="inherit"; }}>
                 <ChevronLeft size={18} />
               </button>
-              <button
-                onClick={next}
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-black text-white hover:bg-white hover:text-black border border-black transition-all duration-200"
-              >
+              <button onClick={() => go((cur + 1) % testimonials.length)}
+                      className="flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200"
+                      style={{ background:GOLD, color:DARK, border:`1.5px solid ${GOLD}` }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background="transparent"; (e.currentTarget as HTMLButtonElement).style.color=GOLD; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background=GOLD; (e.currentTarget as HTMLButtonElement).style.color=DARK; }}>
                 <ChevronRight size={18} />
               </button>
-              <span className="text-xs text-black/30 tracking-widest ml-2">{current + 1} / {testimonials.length}</span>
+
+              {/* Dots */}
+              <div className="flex gap-2 ml-1">
+                {testimonials.map((_, i) => (
+                  <button key={i} onClick={() => go(i)}
+                          style={{
+                            width: i===cur ? "20px" : "6px", height:"6px", borderRadius:"3px",
+                            background: i===cur ? GOLD : "rgba(0,0,0,.15)",
+                            border:"none", padding:0, cursor:"pointer", transition:"all .3s",
+                          }} />
+                ))}
+              </div>
+
+              <span style={{ fontFamily:FONT_BODY, color:"#bbb", fontSize:"11px", marginLeft:"auto" }}>
+                {String(cur+1).padStart(2,"0")} / {String(testimonials.length).padStart(2,"0")}
+              </span>
             </div>
           </div>
         </div>
@@ -619,26 +910,23 @@ function Testimonials() {
   );
 }
 
+// ─── Insights ─────────────────────────────────────────────────────────────────
 function Insights() {
+  const { ref, on } = useReveal(0.1);
+
   return (
-    <section className="py-28 bg-white overflow-hidden">
-      <div className="mx-auto max-w-[1400px] px-8">
-        {/* Overlapping heading block */}
-        <div className="relative mb-16">
-          <div className="overflow-hidden h-48 bg-black/5 mb-[-40px]">
-            <img
-              src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=300&fit=crop&auto=format"
-              alt="Studio insights"
-              className="w-full h-full object-cover object-center opacity-60"
-            />
+    <section id="journal" style={{ background:"#fff" }} className="py-32 overflow-hidden">
+      <div ref={ref as React.RefObject<HTMLDivElement>} className="mx-auto max-w-[1400px] px-8">
+        {/* Overlapping heading */}
+        <div className={`relative mb-16 rv-skew ${on ? "on" : ""}`}>
+          <div className={`clip-reveal mb-[-40px] ${on ? "on" : ""}`} style={{ height:"180px" }}>
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=300&fit=crop&auto=format"
+                 alt="Studio insights" className="w-full h-full object-cover opacity-50" />
           </div>
-          <div className="relative z-10 bg-white pt-4 pb-2 pr-8 inline-block">
-            <p className="mb-2 text-xs uppercase tracking-widest text-black/40 font-medium">Ideas & Writing</p>
-            <h2
-              className="font-display text-[clamp(44px,5.5vw,80px)] leading-[0.9] tracking-tight uppercase"
-              style={{ fontFamily: "'Anton', sans-serif" }}
-            >
-              Latest Thought<br />from the Studio
+          <div className="relative z-10 inline-block pt-4 pb-2 pr-8" style={{ background:"#fff" }}>
+            <Label>Ideas & Writing</Label>
+            <h2 style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(48px,5.5vw,84px)", color:DARK, lineHeight:0.9, letterSpacing:"0.02em" }}>
+              Latest Thought<br/>from the <span style={{ color:GOLD }}>Studio</span>
             </h2>
           </div>
         </div>
@@ -646,143 +934,197 @@ function Insights() {
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {posts.map((post, i) => (
-            <article key={i} className="group cursor-pointer">
-              <div className="overflow-hidden mb-5 bg-black/5">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-52 object-cover transition-transform duration-700 group-hover:scale-105"
-                />
+            <article key={i} className={`group cursor-pointer rv ${on?"on":""} d${i+1}`}>
+              <div className={`clip-reveal mb-5 relative ${on ? "on" : ""}`} style={{ height:"220px" }}>
+                <img src={post.image} alt={post.title}
+                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-400"
+                     style={{ background:"rgba(13,13,13,.6)" }}>
+                  <span style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"10px", letterSpacing:"0.22em",
+                                 border:`1px solid ${GOLD}`, padding:"0.3rem 1rem" }} className="uppercase">
+                    {post.category}
+                  </span>
+                </div>
               </div>
+
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-xs text-black/40 tabular-nums">{post.date}</span>
-                <span className="rounded-full bg-black text-white px-3 py-0.5 text-xs font-bold uppercase tracking-widest">
+                <span style={{ fontFamily:FONT_BODY, color:"#aaa", fontSize:"11px" }}>{post.date}</span>
+                <span style={{ width:"3px", height:"3px", borderRadius:"50%", background:"#ddd", flexShrink:0 }} />
+                <span style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"11px" }}>{post.readTime}</span>
+                <span style={{ fontFamily:FONT_BODY, background:GOLD, color:DARK, fontSize:"9px", letterSpacing:"0.15em",
+                               padding:"0.2rem 0.65rem", marginLeft:"auto", fontWeight:700 }} className="uppercase">
                   {post.category}
                 </span>
               </div>
-              <h3 className="text-sm font-bold uppercase tracking-wide leading-6 group-hover:opacity-50 transition-opacity duration-200">
+
+              <h3 style={{ fontFamily:FONT_BODY, fontWeight:700, fontSize:"13px", letterSpacing:"0.04em",
+                           textTransform:"uppercase", lineHeight:1.6, color:DARK }}
+                  className="group-hover:opacity-50 transition-opacity duration-200 mb-4">
                 {post.title}
               </h3>
-              <a href="#" className="mt-4 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest border-b border-black pb-0.5 hover:opacity-50 transition-opacity">
+
+              <a href="#" className="hl inline-flex items-center gap-2"
+                 style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"11px", fontWeight:700, letterSpacing:"0.18em" }}>
                 Read More <ArrowUpRight size={12} />
               </a>
             </article>
           ))}
+        </div>
+
+        <div className="flex justify-center mt-16">
+          <GoldButton outline>See All Articles</GoldButton>
         </div>
       </div>
     </section>
   );
 }
 
+// ─── Footer ───────────────────────────────────────────────────────────────────
 function Footer() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const fn = () => setShow(window.scrollY > 600);
+    window.addEventListener("scroll", fn, { passive:true });
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+
   return (
-    <footer className="relative overflow-hidden bg-[#141414] text-white pt-24 pb-10">
-      {/* Large watermark logo */}
-      <div
-        className="pointer-events-none select-none absolute bottom-0 right-0 font-display text-[clamp(120px,20vw,280px)] leading-none tracking-tighter uppercase text-white/[0.04] translate-x-[5%] translate-y-[15%]"
-        style={{ fontFamily: "'Anton', sans-serif" }}
-      >
-        OPTIK
-      </div>
+    <>
+      {/* Back to top */}
+      <button onClick={() => window.scrollTo({ top:0, behavior:"smooth" })}
+              aria-label="Back to top"
+              style={{
+                position:"fixed", bottom:"2rem", right:"2rem", zIndex:50,
+                width:"48px", height:"48px", borderRadius:"2px",
+                background: GOLD, color: DARK, border:"none", cursor:"pointer",
+                display:"flex", alignItems:"center", justifyContent:"center",
+                opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(16px)",
+                pointerEvents: show ? "auto" : "none",
+                transition:"opacity .3s, transform .3s",
+                boxShadow:`0 4px 20px rgba(201,169,110,.4)`,
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "#fff"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = GOLD; }}>
+        <ArrowUp size={16} />
+      </button>
 
-      {/* Background image tint */}
-      <div className="absolute inset-0 -z-0 opacity-10">
-        <img
-          src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1400&h=600&fit=crop&auto=format"
-          alt=""
-          aria-hidden
-          className="w-full h-full object-cover object-center"
-        />
-      </div>
+      <footer id="contact" style={{ background: DARK, borderTop:`1px solid rgba(201,169,110,.15)` }} className="relative overflow-hidden pt-24 pb-10">
+        {/* Watermark */}
+        <div style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(120px,20vw,300px)", color:"rgba(201,169,110,.04)",
+                      position:"absolute", bottom:0, right:0, lineHeight:1,
+                      transform:"translate(5%,15%)", pointerEvents:"none", userSelect:"none" }}>
+          OPTIK
+        </div>
 
-      <div className="relative z-10 mx-auto max-w-[1400px] px-8">
-        {/* Top: columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-16 border-b border-white/10">
-          {/* Brand */}
-          <div className="lg:col-span-1">
-            <p
-              className="font-display text-3xl font-black uppercase tracking-[0.15em] mb-4"
-              style={{ fontFamily: "'Anton', sans-serif" }}
-            >
-              OPTIK
-            </p>
-            <p className="text-xs leading-6 text-white/40 max-w-xs">
-              An architecture and design studio working across residential, commercial, cultural, and urban projects worldwide.
-            </p>
-          </div>
+        {/* BG tint */}
+        <div className="absolute inset-0 opacity-10" style={{ zIndex:0 }}>
+          <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1400&h=600&fit=crop&auto=format"
+               alt="" aria-hidden className="w-full h-full object-cover" />
+        </div>
 
-          {/* Quick links */}
-          <div>
-            <p className="mb-5 text-xs uppercase tracking-widest text-white/30 font-medium">Quick Links</p>
-            <div className="flex flex-col gap-3">
-              {["Home", "About", "Services", "Portfolio", "Awards", "Journal", "Contact"].map((link) => (
-                <a key={link} href="#" className="text-xs text-white/50 hover:text-white transition-colors duration-200 uppercase tracking-widest">
-                  {link}
-                </a>
-              ))}
+        <div className="relative z-10 mx-auto max-w-[1400px] px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-16"
+               style={{ borderBottom:"1px solid rgba(201,169,110,.12)" }}>
+            {/* Brand */}
+            <div>
+              <p style={{ fontFamily:FONT_DISPLAY, color:"#fff", fontSize:"2rem", letterSpacing:"0.15em", marginBottom:"1rem" }}>OPTIK</p>
+              <div style={{ width:"32px", height:"2px", background:GOLD, marginBottom:"1rem" }} />
+              <p style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.4)", fontSize:"12px", lineHeight:1.8, maxWidth:"240px" }}>
+                An architecture and design studio working across residential, commercial, cultural, and urban projects worldwide.
+              </p>
             </div>
-          </div>
 
-          {/* Visit */}
-          <div>
-            <p className="mb-5 text-xs uppercase tracking-widest text-white/30 font-medium">Visit</p>
-            <address className="not-italic text-xs text-white/50 leading-7">
-              12 Foundry Lane<br />
-              London EC2A 4RT<br />
-              United Kingdom
-            </address>
-            <a href="tel:+442079460321" className="mt-4 block text-xs text-white/50 hover:text-white transition-colors">
-              +44 20 7946 0321
-            </a>
-          </div>
-
-          {/* Connect */}
-          <div>
-            <p className="mb-5 text-xs uppercase tracking-widest text-white/30 font-medium">Connect</p>
-            <div className="flex flex-col gap-3">
-              {["Instagram", "LinkedIn", "Pinterest", "Behance"].map((platform) => (
-                <a key={platform} href="#" className="text-xs text-white/50 hover:text-white transition-colors duration-200 uppercase tracking-widest">
-                  {platform}
-                </a>
-              ))}
+            {/* Quick links */}
+            <div>
+              <p style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"9px", letterSpacing:"0.22em", marginBottom:"1.25rem" }} className="uppercase">◆ Quick Links</p>
+              <div className="flex flex-col gap-3">
+                {[
+                  { label: "Home", id: "home" },
+                  { label: "About", id: "about" },
+                  { label: "Services", id: "services" },
+                  { label: "Portfolio", id: "portfolio" },
+                  { label: "Awards", id: "awards" },
+                  { label: "Journal", id: "journal" },
+                  { label: "Contact", id: "contact" }
+                ].map(link => (
+                  <a key={link.id} href={`#${link.id}`} className="hl w-fit"
+                     style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.45)", fontSize:"11px", letterSpacing:"0.15em" }}
+                     onClick={e => { e.preventDefault(); scrollToSection(link.id); }}
+                     onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = GOLD}
+                     onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.45)"}
+                  >{link.label}</a>
+                ))}
+              </div>
             </div>
-            <div className="mt-8">
-              <p className="text-xs text-white/30 mb-3 uppercase tracking-widest">Newsletter</p>
-              <div className="flex gap-0">
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  className="flex-1 bg-white/5 border border-white/10 px-3 py-2.5 text-xs text-white placeholder:text-white/20 outline-none focus:border-white/30 transition-colors"
+
+            {/* Visit */}
+            <div>
+              <p style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"9px", letterSpacing:"0.22em", marginBottom:"1.25rem" }} className="uppercase">◆ Visit</p>
+              <address style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.45)", fontSize:"12px", lineHeight:1.9, fontStyle:"normal" }}>
+                Level 5, Maker Maxity, Bandra Kurla Complex<br/>Bandra East, Mumbai 400051<br/>Maharashtra, India
+              </address>
+              <a href="tel:+912261234567"
+                 style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.45)", fontSize:"12px", display:"block", marginTop:"0.75rem" }}
+                 onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = GOLD}
+                 onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.45)"}>
+                +91 22 6123 4567
+              </a>
+            </div>
+
+            {/* Connect + Newsletter */}
+            <div>
+              <p style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"9px", letterSpacing:"0.22em", marginBottom:"1.25rem" }} className="uppercase">◆ Connect</p>
+              <div className="flex flex-col gap-3 mb-8">
+                {["Instagram","LinkedIn","Pinterest","Behance"].map(p => (
+                  <a key={p} href="#" className="hl w-fit"
+                     style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.45)", fontSize:"11px", letterSpacing:"0.15em" }}
+                     onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = GOLD}
+                     onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.45)"}>{p}</a>
+                ))}
+              </div>
+              <p style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.3)", fontSize:"9px", letterSpacing:"0.22em", marginBottom:"0.75rem" }} className="uppercase">Newsletter</p>
+              <div className="flex">
+                <input type="email" placeholder="your@email.com"
+                       style={{ flex:1, background:"rgba(255,255,255,.06)", border:`1px solid rgba(201,169,110,.2)`,
+                                padding:"0.65rem 0.75rem", fontSize:"11px", color:"#fff", outline:"none",
+                                fontFamily:FONT_BODY }}
+                       onFocus={e => (e.currentTarget as HTMLInputElement).style.borderColor=GOLD}
+                       onBlur={e => (e.currentTarget as HTMLInputElement).style.borderColor="rgba(201,169,110,.2)"}
                 />
-                <button className="bg-white text-black px-4 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white border border-white transition-all duration-200">
+                <button style={{ background:GOLD, color:DARK, padding:"0 1rem", border:`1px solid ${GOLD}`,
+                                 fontWeight:700, fontSize:"14px", cursor:"pointer", transition:"all .2s" }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background=DARK; (e.currentTarget as HTMLButtonElement).style.color=GOLD; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background=GOLD; (e.currentTarget as HTMLButtonElement).style.color=DARK; }}>
                   →
                 </button>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Bottom bar */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-white/20">© 2026 Optik Studio Ltd. All rights reserved.</p>
-          <div className="flex gap-6">
-            <a href="#" className="text-xs text-white/20 hover:text-white/50 transition-colors">Privacy Policy</a>
-            <a href="#" className="text-xs text-white/20 hover:text-white/50 transition-colors">Terms of Use</a>
+          <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.2)", fontSize:"11px" }}>© 2026 Optik Studio Ltd. All rights reserved.</p>
+            <div className="flex gap-6">
+              {["Privacy Policy","Terms of Use"].map(t => (
+                <a key={t} href="#"
+                   style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.2)", fontSize:"11px" }}
+                   onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = GOLD}
+                   onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.2)"}>{t}</a>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 }
 
 // ─── App ──────────────────────────────────────────────────────────────────────
-
 export default function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
-
+  const [open, setOpen] = useState(false);
   return (
-    <div className="bg-[#f7f7f7]" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <Header menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+    <div style={{ fontFamily: FONT_BODY }}>
+      <style>{GLOBAL_CSS}</style>
+      <Header open={open} setOpen={setOpen} />
       <Hero />
       <ClientLogos />
       <About />
