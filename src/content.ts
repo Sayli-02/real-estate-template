@@ -55,7 +55,7 @@ export const hero = {
 
   /** Italic sub-headline below the gold line accent */
   subheadline:
-    "We are an architecture and design studio that shapes spaces with intention � from intimate residences to landmark cultural buildings.",
+    "We are an architecture and design studio that shapes spaces with intention — from intimate residences to landmark cultural buildings.",
 
   /** CTA button text */
   ctaLabel: "Explore Our Work",
