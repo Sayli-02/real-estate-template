@@ -4,6 +4,18 @@ import {
   ChevronLeft, ChevronRight, Phone, Menu, X,
   ChevronDown, ArrowUp,
 } from "lucide-react";
+import {
+  brand, navLinks, contact, socialLinks,
+  hero as heroContent,
+  clientLogos,
+  about as aboutContent,
+  portfolioFilters, projects,
+  services,
+  awardsSection, awards,
+  testimonials,
+  insightsSection, posts,
+  footer as footerContent,
+} from "../content";
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 const GOLD    = "#C9A96E";
@@ -16,85 +28,8 @@ const FONT_DISPLAY  = "'Bebas Neue', sans-serif";
 const FONT_EDITORIAL = "'Cormorant Garamond', serif";
 const FONT_BODY     = "'Inter', sans-serif";
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-const projects = [
-  { id: 1, title: "Horizon Villa",       location: "Goa, India",          category: "Residential", image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&h=700&fit=crop&auto=format" },
-  { id: 2, title: "The Meridian Tower",  location: "Mumbai, India",       category: "Commercial",  image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=700&fit=crop&auto=format" },
-  { id: 3, title: "The Courtyard House", location: "Alibaug, India",      category: "Residential", image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&h=700&fit=crop&auto=format" },
-  { id: 4, title: "Vault Arts Centre",   location: "New Delhi, India",    category: "Cultural",    image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1200&h=700&fit=crop&auto=format" },
-  { id: 5, title: "Glass Retreat",       location: "Karjat, India",       category: "Commercial",  image: "https://images.unsplash.com/photo-1549517045-bc93de075e53?w=1200&h=700&fit=crop&auto=format" },
-];
-
-const services = [
-  {
-    num: "01", title: "Architectural Design",
-    description: "From initial concept through to construction documentation, we craft buildings that balance beauty with structural integrity and long-term livability.",
-    tags: ["Concept", "Schematic Design", "Documentation", "Site Supervision"],
-  },
-  {
-    num: "02", title: "Interior Architecture",
-    description: "We shape spaces from the inside out — materiality, light, proportion, and detail considered as one unified composition.",
-    tags: ["Space Planning", "Materials", "Lighting Design", "Furniture"],
-  },
-  {
-    num: "03", title: "Urban Strategy",
-    description: "Large-scale thinking for cities and communities: master planning, public space design, and mixed-use development that adds genuine value.",
-    tags: ["Master Planning", "Mixed-Use", "Public Space", "Zoning"],
-  },
-  {
-    num: "04", title: "Heritage & Adaptive Reuse",
-    description: "Breathing new life into existing buildings. We specialise in sensitive interventions that preserve what matters while enabling what is needed today.",
-    tags: ["Conservation", "Adaptive Reuse", "Heritage", "Restoration"],
-  },
-];
-
-const awards = [
-  { name: "European Architecture Prize",    year: "2023", category: "Residential" },
-  { name: "Dezeen Awards Longlist",         year: "2022", category: "Interior"    },
-  { name: "Architectural Review Award",     year: "2021", category: "Cultural"    },
-  { name: "RIBA International Prize",       year: "2020", category: "Commercial"  },
-  { name: "World Architecture Festival",    year: "2019", category: "Urban"       },
-  { name: "AZ Award — Best New Global Voice", year: "2018", category: "Emerging" },
-];
-
-const testimonials = [
-  {
-    quote: "Optik transformed our brief into something we never could have imagined ourselves — a home that feels both extraordinary and completely natural to live in.",
-    name: "Ananya Sen", role: "Private Residential Client (Goa)",
-    rating: 5,
-    image:  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=500&fit=crop&crop=faces&auto=format",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop&crop=faces&auto=format",
-  },
-  {
-    quote: "The team's understanding of how people actually use public spaces is unrivalled. The cultural centre they designed for us has become the heartbeat of our city.",
-    name: "Kabir Mehta", role: "Director, Delhi Arts Trust",
-    rating: 5,
-    image:  "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=800&h=500&fit=crop&crop=faces&auto=format",
-    avatar: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=120&h=120&fit=crop&crop=faces&auto=format",
-  },
-  {
-    quote: "Working with Optik was a masterclass in rigour. Every detail has a reason. Every space serves a purpose. We could not be prouder of what we built together.",
-    name: "Vikram Malhotra", role: "CEO, Meridian Realty (Mumbai)",
-    rating: 5,
-    image:  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&h=500&fit=crop&crop=faces&auto=format",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop&crop=faces&auto=format",
-  },
-];
-
-const posts = [
-  { date: "June 12, 2026",  category: "Material", readTime: "5 min",
-    title: "Why Concrete Is Having Its Most Interesting Moment in Decades",
-    image: "https://images.unsplash.com/photo-1604754742629-3e5728249d73?w=600&h=400&fit=crop&auto=format" },
-  { date: "May 28, 2026",   category: "Process",  readTime: "7 min",
-    title: "The Brief That Changed How We Think About Natural Light",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop&auto=format" },
-  { date: "April 14, 2026", category: "Urban",    readTime: "9 min",
-    title: "Density Done Right: Lessons from Three Successful Mixed-Use Projects",
-    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&h=400&fit=crop&auto=format" },
-];
-
-const clientLogos = ["VANTA","MERIDIAN","HELIX CO.","SOLVARA","ARCFORM","VEXA","NORDHAUS","STRATO"];
-const FILTERS = ["All","Residential","Commercial","Cultural"];
+// ─── Data ─── (all data is now imported from src/content.ts) ─────────────────
+const FILTERS = portfolioFilters;
 
 // ─── Global keyframes injected via <style> ────────────────────────────────────
 const GLOBAL_CSS = `
@@ -226,12 +161,7 @@ function scrollToSection(id: string) {
   window.scrollTo({ top, behavior: "smooth" });
 }
 
-const NAV_LINKS: { label: string; id: string }[] = [
-  { label: "Home",     id: "home"     },
-  { label: "About",    id: "about"    },
-  { label: "Services", id: "services" },
-  { label: "Contact",  id: "contact"  },
-];
+const NAV_LINKS = navLinks;
 
 // ─── Header ───────────────────────────────────────────────────────────────────
 function Header({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void }) {
@@ -263,7 +193,7 @@ function Header({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => voi
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-5">
           <a href="#" style={{ fontFamily: FONT_DISPLAY, color: scrolled ? "#fff" : "#fff", letterSpacing:"0.2em", fontSize:"1.5rem", fontWeight:400 }}
              className="hover:opacity-70 transition-opacity">
-            OPTIK
+            {brand.name}
           </a>
 
           <nav className="hidden md:flex items-center gap-10">
@@ -288,7 +218,7 @@ function Header({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => voi
               <Phone size={14} />
             </div>
             <span style={{ fontFamily: FONT_BODY, color: "rgba(255,255,255,.55)", letterSpacing:"0.05em" }} className="text-xs">
-              +91 22 6123 4567
+              {contact.phone}
             </span>
           </div>
 
@@ -340,8 +270,8 @@ function Hero() {
     <section id="home" className="relative h-screen min-h-[700px] overflow-hidden" style={{ background: DARK }}>
       {/* Parallax bg */}
       <div ref={imgRef} className="absolute inset-0 scale-110">
-        <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1800&h=1200&fit=crop&auto=format"
-             alt="Hero" className="h-full w-full object-cover" />
+        <img src={heroContent.image}
+             alt={heroContent.imageAlt} className="h-full w-full object-cover" />
         <div className="absolute inset-0" style={{ background:"linear-gradient(to top, rgba(13,13,13,.85) 0%, rgba(13,13,13,.35) 50%, rgba(13,13,13,.2) 100%)" }} />
       </div>
 
@@ -355,7 +285,7 @@ function Hero() {
           letterSpacing: "-0.02em",
           paddingLeft: "1.5rem",
           animation: ready ? "clipReveal 1.4s cubic-bezier(.16,1,.3,1) .5s both" : "none",
-        }}>DREAM&nbsp;STUDIO</div>
+        }}>{brand.heroWatermark}</div>
       </div>
 
       {/* Content */}
@@ -369,11 +299,11 @@ function Hero() {
           fontStyle:"italic", lineHeight:1.8, maxWidth:"520px", marginBottom:"2rem",
           animation: ready ? "fadeUp 1s cubic-bezier(.16,1,.3,1) .35s both" : "none",
         }}>
-          We are an architecture and design studio that shapes spaces with intention — from intimate residences to landmark cultural buildings.
+          {heroContent.subheadline}
         </p>
 
         <div style={{ animation: ready ? "fadeUp 1s cubic-bezier(.16,1,.3,1) .5s both" : "none" }}>
-          <GoldButton onClick={() => scrollToSection("portfolio")}>Explore Our Work</GoldButton>
+          <GoldButton onClick={() => scrollToSection("portfolio")}>{heroContent.ctaLabel}</GoldButton>
         </div>
 
         {/* Floating card */}
@@ -383,15 +313,15 @@ function Hero() {
             background:"rgba(13,13,13,.7)", backdropFilter:"blur(12px)",
             border:`1px solid rgba(201,169,110,.25)`, padding:"1.25rem", width:"230px",
           }}>
-            <p style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"9px", letterSpacing:"0.22em" }} className="uppercase mb-2">◆ Featured Project</p>
-            <p style={{ fontFamily:FONT_DISPLAY, color:"#fff", fontSize:"1.1rem", letterSpacing:"0.08em" }}>Horizon Residence</p>
+            <p style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"9px", letterSpacing:"0.22em" }} className="uppercase mb-2">◆ {heroContent.featuredCard.label}</p>
+            <p style={{ fontFamily:FONT_DISPLAY, color:"#fff", fontSize:"1.1rem", letterSpacing:"0.08em" }}>{heroContent.featuredCard.title}</p>
             <div className="flex items-center gap-1.5 mt-1">
               <MapPin size={10} style={{ color: GOLD }} />
-              <span style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.5)", fontSize:"11px" }}>Goa, India</span>
+              <span style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.5)", fontSize:"11px" }}>{heroContent.featuredCard.location}</span>
             </div>
             <a href="#portfolio" onClick={e => { e.preventDefault(); scrollToSection("portfolio"); }} className="mt-3 flex items-center gap-2 group"
                style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"11px", fontWeight:600, letterSpacing:"0.1em" }}>
-              View Project <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              {heroContent.featuredCard.linkLabel} <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </a>
           </div>
         </div>
@@ -458,14 +388,14 @@ function About() {
           {/* Left */}
           <div className={`flex flex-col gap-10 rvL ${on?"on":""}`}>
             <div>
-              <Label>About Us</Label>
+              <Label>{aboutContent.label}</Label>
               <h2 style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(52px,6vw,96px)", color:DARK, lineHeight:0.9, letterSpacing:"0.02em" }}>
-                Building<br/>Ideas Into<br/>
-                <span style={{ color:GOLD }}>Reality</span>
+                {aboutContent.headingLine1}<br/>{aboutContent.headingLine2}<br/>
+                <span style={{ color:GOLD }}>{aboutContent.headingGold}</span>
               </h2>
             </div>
             <p style={{ fontFamily:FONT_BODY, color:"#555", lineHeight:1.9, fontSize:"0.875rem", maxWidth:"380px" }}>
-              Founded in 2007, Optik has grown from a two-person practice into a studio of over sixty designers, architects, and urban thinkers. We are drawn to complexity — projects that require invention, not formula.
+              {aboutContent.body}
             </p>
             <a href="#" className="hl inline-flex items-center gap-2 w-fit"
                style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"11px", fontWeight:700, letterSpacing:"0.18em" }}
@@ -478,9 +408,9 @@ function About() {
             <div ref={sRef as React.RefObject<HTMLDivElement>}
                  className="grid grid-cols-3 gap-8 pt-8"
                  style={{ borderTop:`1px solid rgba(0,0,0,.1)` }}>
-              <Counter value={17}  label="Years of practice" active={statsOn} />
-              <Counter value={67}  suffix="+" label="Studio members"   active={statsOn} />
-              <Counter value={120} suffix="+" label="Projects built"   active={statsOn} />
+              {aboutContent.stats.map((s, i) => (
+                <Counter key={i} value={s.value} suffix={s.suffix} label={s.label} active={statsOn} />
+              ))}
             </div>
           </div>
 
@@ -492,19 +422,19 @@ function About() {
                           display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
                           border:`4px solid ${OFF_W}`, animation:"goldPulse 2.5s infinite" }}>
               <span style={{ fontFamily:FONT_BODY, color:DARK, fontSize:"8px", letterSpacing:"0.1em", fontWeight:600 }}>Est.</span>
-              <span style={{ fontFamily:FONT_DISPLAY, color:DARK, fontSize:"1.3rem" }}>2007</span>
+              <span style={{ fontFamily:FONT_DISPLAY, color:DARK, fontSize:"1.3rem" }}>{aboutContent.estYear}</span>
             </div>
 
             <div className={`clip-reveal group relative ${on ? "on" : ""}`}>
-              <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=700&h=450&fit=crop&auto=format"
-                   alt="Studio interior" className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              <img src={aboutContent.images.top.src}
+                   alt={aboutContent.images.top.alt} className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
                    style={{ height:"320px" }} />
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                    style={{ background:"linear-gradient(to top,rgba(13,13,13,.5),transparent)" }} />
             </div>
             <div className={`clip-reveal group relative ml-12 ${on ? "on" : ""}`}>
-              <img src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=700&h=350&fit=crop&auto=format"
-                   alt="Architecture detail" className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              <img src={aboutContent.images.bottom.src}
+                   alt={aboutContent.images.bottom.alt} className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
                    style={{ height:"220px" }} />
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                    style={{ background:"linear-gradient(to top,rgba(13,13,13,.5),transparent)" }} />
@@ -612,12 +542,7 @@ function Services() {
   const [active, setActive] = useState(0);
   const { ref, on } = useReveal(0.1);
 
-  const imgs = [
-    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=700&h=600&fit=crop&auto=format",
-    "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=700&h=600&fit=crop&auto=format",
-    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=700&h=600&fit=crop&auto=format",
-    "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=700&h=600&fit=crop&auto=format",
-  ];
+  const imgs = services.map(s => s.image);
 
   return (
     <section id="services" style={{ background: DARK }} className="py-32">
@@ -728,14 +653,14 @@ function Awards() {
           {/* Left */}
           <div className={`flex flex-col gap-4 rvL ${on?"on":""}`}>
             <div className={`clip-reveal group ${on ? "on" : ""}`}>
-              <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=700&h=420&fit=crop&auto=format"
-                   alt="Award winning project"
+              <img src={awardsSection.images.top.src}
+                   alt={awardsSection.images.top.alt}
                    className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
                    style={{ height:"260px" }} />
             </div>
             <div className={`clip-reveal ml-16 group ${on ? "on" : ""}`}>
-              <img src="https://images.unsplash.com/photo-1604754742629-3e5728249d73?w=600&h=300&fit=crop&auto=format"
-                   alt="Architecture detail"
+              <img src={awardsSection.images.bottom.src}
+                   alt={awardsSection.images.bottom.alt}
                    className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
                    style={{ height:"180px" }} />
             </div>
@@ -747,15 +672,15 @@ function Awards() {
                   <circle cx="40" cy="40" r="36" fill="none" stroke={GOLD} strokeWidth="1" strokeDasharray="5 9" strokeLinecap="round" strokeOpacity="0.5" />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span style={{ fontFamily:FONT_DISPLAY, color:GOLD, fontSize:"1.6rem", lineHeight:1 }}>17</span>
+                  <span style={{ fontFamily:FONT_DISPLAY, color:GOLD, fontSize:"1.6rem", lineHeight:1 }}>{awardsSection.badgeYears}</span>
                   <span style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.4)", fontSize:"8px", letterSpacing:"0.15em" }} className="uppercase">Yrs</span>
                 </div>
               </div>
               <p style={{ fontFamily:FONT_EDITORIAL, color:"rgba(255,255,255,.55)", fontSize:"0.9rem", fontStyle:"italic", lineHeight:1.7 }}>
-                "Architecture is not about buildings. It is about people and how they inhabit space."
+                {awardsSection.quote.text}
                 <br/>
                 <span style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.3)", fontSize:"10px", letterSpacing:"0.15em", fontStyle:"normal" }}>
-                  — Kabir Sharma, Founder
+                  {awardsSection.quote.attribution}
                 </span>
               </p>
             </div>
@@ -763,9 +688,9 @@ function Awards() {
 
           {/* Right */}
           <div className={`rvR ${on?"on":""}`}>
-            <Label>Recognition</Label>
+            <Label>{awardsSection.label}</Label>
             <h2 style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(48px,5vw,76px)", color:"#fff", lineHeight:0.9, letterSpacing:"0.02em", marginBottom:"3rem" }}>
-              Awards &<br/><span style={{ color:GOLD }}>Honours</span>
+              {awardsSection.headingLine1}<br/><span style={{ color:GOLD }}>{awardsSection.headingGold}</span>
             </h2>
 
             <div className="flex flex-col">
@@ -920,13 +845,13 @@ function Insights() {
         {/* Overlapping heading */}
         <div className={`relative mb-16 rv-skew ${on ? "on" : ""}`}>
           <div className={`clip-reveal mb-[-40px] ${on ? "on" : ""}`} style={{ height:"180px" }}>
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=300&fit=crop&auto=format"
-                 alt="Studio insights" className="w-full h-full object-cover opacity-50" />
+            <img src={insightsSection.bannerImage.src}
+                 alt={insightsSection.bannerImage.alt} className="w-full h-full object-cover opacity-50" />
           </div>
           <div className="relative z-10 inline-block pt-4 pb-2 pr-8" style={{ background:"#fff" }}>
-            <Label>Ideas & Writing</Label>
+            <Label>{insightsSection.label}</Label>
             <h2 style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(48px,5.5vw,84px)", color:DARK, lineHeight:0.9, letterSpacing:"0.02em" }}>
-              Latest Thought<br/>from the <span style={{ color:GOLD }}>Studio</span>
+              {insightsSection.headingLine1}<br/>{insightsSection.headingLine2} <span style={{ color:GOLD }}>{insightsSection.headingGold}</span>
             </h2>
           </div>
         </div>
@@ -1013,12 +938,12 @@ function Footer() {
         <div style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(120px,20vw,300px)", color:"rgba(201,169,110,.04)",
                       position:"absolute", bottom:0, right:0, lineHeight:1,
                       transform:"translate(5%,15%)", pointerEvents:"none", userSelect:"none" }}>
-          OPTIK
+          {brand.name}
         </div>
 
         {/* BG tint */}
         <div className="absolute inset-0 opacity-10" style={{ zIndex:0 }}>
-          <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1400&h=600&fit=crop&auto=format"
+          <img src={footerContent.bgImage}
                alt="" aria-hidden className="w-full h-full object-cover" />
         </div>
 
@@ -1027,10 +952,10 @@ function Footer() {
                style={{ borderBottom:"1px solid rgba(201,169,110,.12)" }}>
             {/* Brand */}
             <div>
-              <p style={{ fontFamily:FONT_DISPLAY, color:"#fff", fontSize:"2rem", letterSpacing:"0.15em", marginBottom:"1rem" }}>OPTIK</p>
+              <p style={{ fontFamily:FONT_DISPLAY, color:"#fff", fontSize:"2rem", letterSpacing:"0.15em", marginBottom:"1rem" }}>{brand.name}</p>
               <div style={{ width:"32px", height:"2px", background:GOLD, marginBottom:"1rem" }} />
               <p style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.4)", fontSize:"12px", lineHeight:1.8, maxWidth:"240px" }}>
-                An architecture and design studio working across residential, commercial, cultural, and urban projects worldwide.
+                {brand.tagline}
               </p>
             </div>
 
@@ -1060,14 +985,14 @@ function Footer() {
             {/* Visit */}
             <div>
               <p style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"9px", letterSpacing:"0.22em", marginBottom:"1.25rem" }} className="uppercase">◆ Visit</p>
-              <address style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.45)", fontSize:"12px", lineHeight:1.9, fontStyle:"normal" }}>
-                Level 5, Maker Maxity, Bandra Kurla Complex<br/>Bandra East, Mumbai 400051<br/>Maharashtra, India
+              <address style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.45)", fontSize:"12px", lineHeight:1.9, fontStyle:"normal", whiteSpace:"pre-line" }}>
+                {contact.address}
               </address>
-              <a href="tel:+912261234567"
+              <a href={contact.phoneHref}
                  style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.45)", fontSize:"12px", display:"block", marginTop:"0.75rem" }}
                  onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = GOLD}
                  onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,.45)"}>
-                +91 22 6123 4567
+                {contact.phone}
               </a>
             </div>
 
@@ -1075,7 +1000,7 @@ function Footer() {
             <div>
               <p style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"9px", letterSpacing:"0.22em", marginBottom:"1.25rem" }} className="uppercase">◆ Connect</p>
               <div className="flex flex-col gap-3 mb-8">
-                {["Instagram","LinkedIn","Pinterest","Behance"].map(p => (
+                {socialLinks.map(p => (
                   <a key={p} href="#" className="hl w-fit"
                      style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.45)", fontSize:"11px", letterSpacing:"0.15em" }}
                      onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = GOLD}
@@ -1102,9 +1027,9 @@ function Footer() {
           </div>
 
           <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.2)", fontSize:"11px" }}>© 2026 Optik Studio Ltd. All rights reserved.</p>
+            <p style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.2)", fontSize:"11px" }}>{brand.copyright}</p>
             <div className="flex gap-6">
-              {["Privacy Policy","Terms of Use"].map(t => (
+              {footerContent.legalLinks.map(t => (
                 <a key={t} href="#"
                    style={{ fontFamily:FONT_BODY, color:"rgba(255,255,255,.2)", fontSize:"11px" }}
                    onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = GOLD}
