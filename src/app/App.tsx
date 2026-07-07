@@ -62,8 +62,8 @@ const GLOBAL_CSS = `
   .hl{ position:relative; }
 
   /* Premium extra animations */
-  .text-reveal { overflow: hidden; display: block; }
-  .text-reveal span { transform: translateY(105%); display: block; transition: transform 1.4s cubic-bezier(.16,1,.3,1); transition-delay: inherit; }
+  .text-reveal { overflow: hidden; display: inline-block; vertical-align: bottom; }
+  .text-reveal span { transform: translateY(105%); display: inline-block; transition: transform 1.4s cubic-bezier(.16,1,.3,1); transition-delay: inherit; }
   .text-reveal.on span { transform: translateY(0); }
 
   .scale-reveal { opacity: 0; transform: scale(0.90); transition: opacity 1.3s cubic-bezier(.16,1,.3,1), transform 1.3s cubic-bezier(.16,1,.3,1); }
@@ -71,7 +71,7 @@ const GLOBAL_CSS = `
 
   .rv-3d { perspective: 1000px; }
   .rv-3d-child { opacity: 0; transform: rotateX(25deg) translateY(60px); transition: opacity 1.3s cubic-bezier(.16,1,.3,1), transform 1.3s cubic-bezier(.16,1,.3,1); }
-  .rv-3d.on .rv-3d-child { opacity: 1; transform: rotateX(0deg) translateY(0); }
+  .rv-3d-child.on { opacity: 1; transform: rotateX(0deg) translateY(0); }
 `;
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
