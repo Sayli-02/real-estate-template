@@ -20,7 +20,7 @@ export const brand = {
     "An architecture and design studio working across residential, commercial, cultural, and urban projects worldwide.",
 
   /** Copyright line in the footer */
-  copyright: "© 2026 Optik Studio Ltd. All rights reserved.",
+  copyright: "ï¿½ 2026 Optik Studio Ltd. All rights reserved.",
 };
 
 // --- Navigation --------------------------------------------------------------
@@ -55,7 +55,7 @@ export const hero = {
 
   /** Italic sub-headline below the gold line accent */
   subheadline:
-    "We are an architecture and design studio that shapes spaces with intention — from intimate residences to landmark cultural buildings.",
+    "We are an architecture and design studio that shapes spaces with intention ï¿½ from intimate residences to landmark cultural buildings.",
 
   /** CTA button text */
   ctaLabel: "Explore Our Work",
@@ -91,7 +91,7 @@ export const about = {
   headingLine2: "Ideas Into",
   headingGold: "Reality",
   body:
-    "Founded in 2007, Optik has grown from a two-person practice into a studio of over sixty designers, architects, and urban thinkers. We are drawn to complexity — projects that require invention, not formula.",
+    "Founded in 2007, Optik has grown from a two-person practice into a studio of over sixty designers, architects, and urban thinkers. We are drawn to complexity projects that require invention, not formula.",
   estYear: "2007",
 
   stats: [
@@ -185,7 +185,7 @@ export const services: Service[] = [
     num: "02",
     title: "Interior Architecture",
     description:
-      "We shape spaces from the inside out — materiality, light, proportion, and detail considered as one unified composition.",
+      "We shape spaces from the inside out ï¿½ materiality, light, proportion, and detail considered as one unified composition.",
     tags: ["Space Planning", "Materials", "Lighting Design", "Furniture"],
     image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=700&h=600&fit=crop&auto=format",
   },
@@ -216,7 +216,7 @@ export const awardsSection = {
 
   quote: {
     text: '"Architecture is not about buildings. It is about people and how they inhabit space."',
-    attribution: "— Kabir Sharma, Founder",
+    attribution: "ï¿½ Kabir Sharma, Founder",
   },
 
   badgeYears: 17,
@@ -245,7 +245,7 @@ export const awards: Award[] = [
   { name: "Architectural Review Award",       year: "2021", category: "Cultural"    },
   { name: "RIBA International Prize",         year: "2020", category: "Commercial"  },
   { name: "World Architecture Festival",      year: "2019", category: "Urban"       },
-  { name: "AZ Award — Best New Global Voice", year: "2018", category: "Emerging"   },
+  { name: "AZ Award ï¿½ Best New Global Voice", year: "2018", category: "Emerging"   },
 ];
 
 // --- Testimonials Section -----------------------------------------------------
@@ -262,7 +262,7 @@ export interface Testimonial {
 export const testimonials: Testimonial[] = [
   {
     quote:
-      "Optik transformed our brief into something we never could have imagined ourselves — a home that feels both extraordinary and completely natural to live in.",
+      "Optik transformed our brief into something we never could have imagined ourselves ï¿½ a home that feels both extraordinary and completely natural to live in.",
     name: "Ananya Sen",
     role: "Private Residential Client (Goa)",
     rating: 5,
