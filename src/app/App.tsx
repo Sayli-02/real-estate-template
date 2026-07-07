@@ -47,7 +47,7 @@ const GLOBAL_CSS = `
   .rvL.on{ opacity:1; transform:translateX(0) scale(1); }
   .rvR  { opacity:0; transform:translateX(60px) scale(0.98); transition:opacity 1.2s cubic-bezier(.16,1,.3,1), transform 1.2s cubic-bezier(.16,1,.3,1); }
   .rvR.on{ opacity:1; transform:translateX(0) scale(1); }
-  .d1{transition-delay:.08s} .d2{transition-delay:.16s} .d3{transition-delay:.24s} .d4{transition-delay:.32s}
+  .d1{transition-delay:.08s} .d2{transition-delay:.16s} .d3{transition-delay:.24s} .d4{transition-delay:.32s} .d5{transition-delay:.40s} .d6{transition-delay:.48s}
 
   .rv-skew { opacity:0; transform:translateY(80px) skewY(3deg); transition:opacity 1.4s cubic-bezier(.16,1,.3,1), transform 1.4s cubic-bezier(.16,1,.3,1); }
   .rv-skew.on { opacity:1; transform:translateY(0) skewY(0); }
@@ -60,6 +60,18 @@ const GLOBAL_CSS = `
   .hl::after{ content:''; position:absolute; bottom:-2px; left:0; width:0; height:1.5px; background:currentColor; transition:width .3s cubic-bezier(.16,1,.3,1); }
   .hl:hover::after{ width:100%; }
   .hl{ position:relative; }
+
+  /* Premium extra animations */
+  .text-reveal { overflow: hidden; display: block; }
+  .text-reveal span { transform: translateY(105%); display: block; transition: transform 1.4s cubic-bezier(.16,1,.3,1); transition-delay: inherit; }
+  .text-reveal.on span { transform: translateY(0); }
+
+  .scale-reveal { opacity: 0; transform: scale(0.90); transition: opacity 1.3s cubic-bezier(.16,1,.3,1), transform 1.3s cubic-bezier(.16,1,.3,1); }
+  .scale-reveal.on { opacity: 1; transform: scale(1); }
+
+  .rv-3d { perspective: 1000px; }
+  .rv-3d-child { opacity: 0; transform: rotateX(25deg) translateY(60px); transition: opacity 1.3s cubic-bezier(.16,1,.3,1), transform 1.3s cubic-bezier(.16,1,.3,1); }
+  .rv-3d.on .rv-3d-child { opacity: 1; transform: rotateX(0deg) translateY(0); }
 `;
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
@@ -108,6 +120,27 @@ function Label({ children }: { children: string }) {
        className="mb-3 text-[10px] font-semibold uppercase">
       ◆ {children}
     </p>
+  );
+}
+
+/** Animated heading component for clean scroll reveals of typography */
+function AnimatedHeading({ line1, line2, gold, dark = true, on }: { line1: string; line2?: string; gold?: string; dark?: boolean; on: boolean }) {
+  return (
+    <h2 className="mb-6" style={{ fontFamily: FONT_DISPLAY, fontSize: "clamp(48px, 5.5vw, 84px)", color: dark ? DARK : "#fff", lineHeight: 0.95, letterSpacing: "0.02em" }}>
+      <span className={`text-reveal ${on ? "on" : ""}`} style={{ transitionDelay: "0.05s" }}>
+        <span>{line1}</span>
+      </span>
+      {line2 && (
+        <span className={`text-reveal ${on ? "on" : ""}`} style={{ transitionDelay: "0.15s" }}>
+          <span>{line2}</span>
+        </span>
+      )}
+      {gold && (
+        <span className={`text-reveal ${on ? "on" : ""}`} style={{ transitionDelay: "0.25s" }}>
+          <span style={{ color: GOLD }}>{gold}</span>
+        </span>
+      )}
+    </h2>
   );
 }
 
@@ -389,10 +422,12 @@ function About() {
           <div className={`flex flex-col gap-10 rvL ${on?"on":""}`}>
             <div>
               <Label>{aboutContent.label}</Label>
-              <h2 style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(52px,6vw,96px)", color:DARK, lineHeight:0.9, letterSpacing:"0.02em" }}>
-                {aboutContent.headingLine1}<br/>{aboutContent.headingLine2}<br/>
-                <span style={{ color:GOLD }}>{aboutContent.headingGold}</span>
-              </h2>
+              <AnimatedHeading 
+                line1={aboutContent.headingLine1}
+                line2={aboutContent.headingLine2}
+                gold={aboutContent.headingGold}
+                on={on}
+              />
             </div>
             <p style={{ fontFamily:FONT_BODY, color:"#555", lineHeight:1.9, fontSize:"0.875rem", maxWidth:"380px" }}>
               {aboutContent.body}
@@ -463,12 +498,10 @@ function Portfolio() {
     <section id="portfolio" style={{ background:"#fff" }} className="py-32 overflow-hidden">
       <div ref={ref as React.RefObject<HTMLDivElement>} className="mx-auto max-w-[1400px] px-8">
         {/* Header */}
-        <div className={`flex items-end justify-between mb-10 rv-skew ${on ? "on" : ""}`}>
+        <div className={`flex items-end justify-between mb-10 rv ${on ? "on" : ""}`}>
           <div>
             <Label>Selected Work</Label>
-            <h2 style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(48px,5.5vw,84px)", color:DARK, lineHeight:0.9, letterSpacing:"0.02em" }}>
-              Port<span style={{ color:GOLD }}>folio</span>
-            </h2>
+            <AnimatedHeading line1="Port" gold="folio" on={on} />
           </div>
           <a href="#" className="hl hidden md:inline-flex items-center gap-2"
              style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"11px", fontWeight:700, letterSpacing:"0.18em" }}>
@@ -496,12 +529,12 @@ function Portfolio() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 rv-3d"
              style={{ gap:"1px", background:"rgba(0,0,0,.08)" }}>
           {filtered.map((p, i) => (
             <div key={p.id}
-                 className={`group relative overflow-hidden rv ${on?"on":""} d${Math.min(i+1,4)} ${i===0 && filter==="All" ? "lg:col-span-2":""}`}
-                 style={{ background:OFF_W }}>
+                 className={`group relative overflow-hidden rv-3d-child ${on?"on":""} d${Math.min(i+1,5)} ${i===0 && filter==="All" ? "lg:col-span-2":""}`}
+                 style={{ background:OFF_W, transitionDelay: `${i * 0.08}s` }}>
               <div className={`clip-reveal ${on ? "on" : ""}`} style={{ height: i===0 && filter==="All" ? "380px" : "270px" }}>
                 <img src={p.image} alt={p.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 {/* Hover overlay */}
@@ -552,9 +585,7 @@ function Services() {
           {/* Left */}
           <div className={`rvL ${on?"on":""}`}>
             <Label>What We Do</Label>
-            <h2 style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(48px,5vw,76px)", color:"#fff", lineHeight:0.9, letterSpacing:"0.02em", marginBottom:"3rem" }}>
-              Our<br/><span style={{ color:GOLD }}>Services</span>
-            </h2>
+            <AnimatedHeading line1="Our" gold="Services" dark={false} on={on} />
 
             <div className="flex flex-col">
               {services.map((svc, i) => {
@@ -689,9 +720,7 @@ function Awards() {
           {/* Right */}
           <div className={`rvR ${on?"on":""}`}>
             <Label>{awardsSection.label}</Label>
-            <h2 style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(48px,5vw,76px)", color:"#fff", lineHeight:0.9, letterSpacing:"0.02em", marginBottom:"3rem" }}>
-              {awardsSection.headingLine1}<br/><span style={{ color:GOLD }}>{awardsSection.headingGold}</span>
-            </h2>
+            <AnimatedHeading line1={awardsSection.headingLine1} gold={awardsSection.headingGold} dark={false} on={on} />
 
             <div className="flex flex-col">
               {awards.map((aw, i) => (
@@ -850,9 +879,7 @@ function Insights() {
           </div>
           <div className="relative z-10 inline-block pt-4 pb-2 pr-8" style={{ background:"#fff" }}>
             <Label>{insightsSection.label}</Label>
-            <h2 style={{ fontFamily:FONT_DISPLAY, fontSize:"clamp(48px,5.5vw,84px)", color:DARK, lineHeight:0.9, letterSpacing:"0.02em" }}>
-              {insightsSection.headingLine1}<br/>{insightsSection.headingLine2} <span style={{ color:GOLD }}>{insightsSection.headingGold}</span>
-            </h2>
+            <AnimatedHeading line1={insightsSection.headingLine1} line2={insightsSection.headingLine2} gold={insightsSection.headingGold} on={on} />
           </div>
         </div>
 
