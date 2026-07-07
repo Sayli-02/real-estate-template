@@ -814,7 +814,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
             {activeTab === "gallery" ? (
               <GalleryViewer images={project.gallery && project.gallery.length > 0 ? project.gallery : [project.image]} />
             ) : (
-              <PanoramaViewer image={project.panoramaImage} />
+              <PanoramaViewer key={project.panoramaImage} image={project.panoramaImage} />
             )}
           </div>
         </div>

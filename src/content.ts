@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //  content.ts
 //  Edit any value here and the website will automatically reflect the change.
 //  Images: use absolute URLs (Unsplash / your CDN) or /public paths.
@@ -136,7 +136,7 @@ export const projects: Project[] = [
       "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&h=750&fit=crop&auto=format",
       "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=1200&h=750&fit=crop&auto=format",
     ],
-    panoramaImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=3000&h=900&fit=crop&auto=format",
+    panoramaImage: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=3000&h=1000&fit=crop&auto=format",
     description:
       "An ocean-facing private villa perched on the cliffs of North Goa. Designed to dissolve the boundary between interior and sea view, Horizon Villa is a testament to understated luxury — where every room frames the Arabian Sea at golden hour.",
     price: "₹8.5 Cr",
@@ -163,7 +163,7 @@ export const projects: Project[] = [
       "https://images.unsplash.com/photo-1462899006636-339e08d1844e?w=1200&h=750&fit=crop&auto=format",
       "https://images.unsplash.com/photo-1604328698692-f76ea9498e76?w=1200&h=750&fit=crop&auto=format",
     ],
-    panoramaImage: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=3000&h=900&fit=crop&auto=format",
+    panoramaImage: "https://images.unsplash.com/photo-1545232979-8bf34eb9757b?w=3000&h=1000&fit=crop&auto=format",
     description:
       "A 32-storey commercial landmark in the heart of Mumbai's Bandra Kurla Complex. The Meridian Tower redefines Grade-A office space with its climate-responsive facade, sky gardens on every fourth floor, and a rooftop amenity deck with panoramic city views.",
     price: "₹45 Cr",
@@ -188,7 +188,7 @@ export const projects: Project[] = [
       "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&h=750&fit=crop&auto=format",
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&h=750&fit=crop&auto=format",
     ],
-    panoramaImage: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=3000&h=900&fit=crop&auto=format",
+    panoramaImage: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=3000&h=1000&fit=crop&auto=format",
     description:
       "A serene weekend retreat organized around a central limestone courtyard that channels coastal breezes. The Courtyard House draws on Konkan vernacular architecture — thick walls, shaded verandas, and an outdoor bathing court — reinterpreted in a contemporary language.",
     price: "₹3.2 Cr",
@@ -215,7 +215,7 @@ export const projects: Project[] = [
       "https://images.unsplash.com/photo-1604754742629-3e5728249d73?w=1200&h=750&fit=crop&auto=format",
       "https://images.unsplash.com/photo-1543906965-f9520aa2ed8a?w=1200&h=750&fit=crop&auto=format",
     ],
-    panoramaImage: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=3000&h=900&fit=crop&auto=format",
+    panoramaImage: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=3000&h=1000&fit=crop&auto=format",
     description:
       "A civic landmark for contemporary arts in Lutyens' Delhi. Vault's subterranean galleries create a world beneath the city, where natural light filters through a monumental skylight grid. The building is designed for permanence — its raw concrete shell expected to outlast several generations of exhibitions.",
     price: "Public Institution",
@@ -240,7 +240,7 @@ export const projects: Project[] = [
       "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&h=750&fit=crop&auto=format",
       "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&h=750&fit=crop&auto=format",
     ],
-    panoramaImage: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=3000&h=900&fit=crop&auto=format",
+    panoramaImage: "https://images.unsplash.com/photo-1601918774516-b0cb2cd08c10?w=3000&h=1000&fit=crop&auto=format",
     description:
       "A high-altitude corporate retreat anchored in the Western Ghats. Floor-to-ceiling glass walls dissolve the boundary between boardroom and rainforest. Glass Retreat is designed for focused work — silent, distraction-free, and profoundly connected to the natural world.",
     price: "₹6.8 Cr",
