@@ -1,31 +1,21 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 //  content.ts
-//  ? Single source of truth for ALL website content and images.
-//  ? Edit any value here and the website will automatically reflect the change.
-//  ? Images should be absolute URLs (Unsplash, your CDN, etc.) or relative
-//    paths to files inside /public (e.g. "/images/hero.jpg").
+//  Edit any value here and the website will automatically reflect the change.
+//  Images: use absolute URLs (Unsplash / your CDN) or /public paths.
 // -----------------------------------------------------------------------------
 
 // --- Brand / Site Identity ---------------------------------------------------
 
 export const brand = {
-  /** Studio name shown in the nav-bar and footer watermark */
   name: "OPTIK",
-
-  /** Watermark text displayed behind the hero headline */
   heroWatermark: "DREAM\u00a0STUDIO",
-
-  /** Short one-liner shown in the footer's brand column */
   tagline:
     "An architecture and design studio working across residential, commercial, cultural, and urban projects worldwide.",
-
-  /** Copyright line in the footer */
-  copyright: "� 2026 Optik Studio Ltd. All rights reserved.",
+  copyright: "© 2026 Optik Studio Ltd. All rights reserved.",
 };
 
 // --- Navigation --------------------------------------------------------------
 
-/** Links shown in the top navigation bar (label ? section ID). */
 export const navLinks: { label: string; id: string }[] = [
   { label: "Home",     id: "home"     },
   { label: "About",    id: "about"    },
@@ -41,26 +31,18 @@ export const contact = {
   address: "Level 5, Maker Maxity, Bandra Kurla Complex\nBandra East, Mumbai 400051\nMaharashtra, India",
 };
 
-// --- Social Links -------------------------------------------------------------
+// --- Social Links ------------------------------------------------------------
 
-/** Labels shown in the footer "Connect" column. */
 export const socialLinks = ["Instagram", "LinkedIn", "Pinterest", "Behance"];
 
-// --- Hero Section -------------------------------------------------------------
+// --- Hero Section ------------------------------------------------------------
 
 export const hero = {
-  /** Large background image (parallax) */
   image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1800&h=1200&fit=crop&auto=format",
   imageAlt: "Hero architecture photograph",
-
-  /** Italic sub-headline below the gold line accent */
   subheadline:
     "We are an architecture and design studio that shapes spaces with intention — from intimate residences to landmark cultural buildings.",
-
-  /** CTA button text */
   ctaLabel: "Explore Our Work",
-
-  /** Floating card in the bottom-right corner */
   featuredCard: {
     label: "Featured Project",
     title: "Horizon Residence",
@@ -69,21 +51,14 @@ export const hero = {
   },
 };
 
-// --- Client Logos (Marquee) ---------------------------------------------------
+// --- Client Logos (Marquee) --------------------------------------------------
 
-/** Company names that scroll across the "Trusted By" marquee bar */
 export const clientLogos = [
-  "VANTA",
-  "MERIDIAN",
-  "HELIX CO.",
-  "SOLVARA",
-  "ARCFORM",
-  "VEXA",
-  "NORDHAUS",
-  "STRATO",
+  "VANTA", "MERIDIAN", "HELIX CO.", "SOLVARA",
+  "ARCFORM", "VEXA", "NORDHAUS", "STRATO",
 ];
 
-// --- About Section ------------------------------------------------------------
+// --- About Section -----------------------------------------------------------
 
 export const about = {
   label: "About Us",
@@ -91,15 +66,13 @@ export const about = {
   headingLine2: "Ideas Into",
   headingGold: "Reality",
   body:
-    "Founded in 2007, Optik has grown from a two-person practice into a studio of over sixty designers, architects, and urban thinkers. We are drawn to complexity projects that require invention, not formula.",
+    "Founded in 2007, Optik has grown from a two-person practice into a studio of over sixty designers, architects, and urban thinkers. We are drawn to complexity — projects that require invention, not formula.",
   estYear: "2007",
-
   stats: [
     { value: 17,  suffix: "",  label: "Years of practice" },
     { value: 67,  suffix: "+", label: "Studio members"   },
     { value: 120, suffix: "+", label: "Projects built"   },
   ] as { value: number; suffix: string; label: string }[],
-
   images: {
     top: {
       src: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=700&h=450&fit=crop&auto=format",
@@ -112,7 +85,7 @@ export const about = {
   },
 };
 
-// --- Portfolio Section --------------------------------------------------------
+// --- Portfolio Section -------------------------------------------------------
 
 export const portfolioFilters = ["All", "Residential", "Commercial", "Cultural"];
 
@@ -121,48 +94,166 @@ export interface Project {
   title: string;
   location: string;
   category: string;
+  /** Main card thumbnail */
   image: string;
+  /** Gallery images shown in the project detail modal */
+  gallery: string[];
+  /**
+   * Wide panoramic image (3:1 aspect ratio ideal) for the interactive 360° viewer.
+   * The viewer lets users drag left/right to pan across the image.
+   */
+  panoramaImage: string;
+  /** Short project description */
+  description: string;
+  /** Sale / purchase price, e.g. "₹8.5 Cr" */
+  price: string;
+  /** Monthly rent, e.g. "₹2.5L / month" — set to "" to hide */
+  rent: string;
+  /** Total floor area, e.g. "6,200 sq.ft" */
+  area: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  yearBuilt: string;
+  /** "Available" | "Sold" | "For Rent" | "Operational" */
+  status: string;
+  /** Amenity chips shown in the modal */
+  amenities: string[];
+  architect?: string;
 }
 
 export const projects: Project[] = [
+  // ── 1 ─ Horizon Villa ──────────────────────────────────────────────────────
   {
     id: 1,
     title: "Horizon Villa",
     location: "Goa, India",
     category: "Residential",
     image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&h=700&fit=crop&auto=format",
+    gallery: [
+      "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=1200&h=750&fit=crop&auto=format",
+    ],
+    panoramaImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=3000&h=900&fit=crop&auto=format",
+    description:
+      "An ocean-facing private villa perched on the cliffs of North Goa. Designed to dissolve the boundary between interior and sea view, Horizon Villa is a testament to understated luxury — where every room frames the Arabian Sea at golden hour.",
+    price: "₹8.5 Cr",
+    rent: "₹2.5L / month",
+    area: "6,200 sq.ft",
+    bedrooms: 5,
+    bathrooms: 6,
+    yearBuilt: "2023",
+    status: "Available",
+    amenities: ["Infinity Pool", "Home Theatre", "Smart Home", "Private Garden", "3-Car Garage", "Sea View Terrace", "Staff Quarters"],
+    architect: "Kabir Sharma",
   },
+
+  // ── 2 ─ The Meridian Tower ─────────────────────────────────────────────────
   {
     id: 2,
     title: "The Meridian Tower",
     location: "Mumbai, India",
     category: "Commercial",
     image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=700&fit=crop&auto=format",
+    gallery: [
+      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1462899006636-339e08d1844e?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1604328698692-f76ea9498e76?w=1200&h=750&fit=crop&auto=format",
+    ],
+    panoramaImage: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=3000&h=900&fit=crop&auto=format",
+    description:
+      "A 32-storey commercial landmark in the heart of Mumbai's Bandra Kurla Complex. The Meridian Tower redefines Grade-A office space with its climate-responsive facade, sky gardens on every fourth floor, and a rooftop amenity deck with panoramic city views.",
+    price: "₹45 Cr",
+    rent: "₹8L / month",
+    area: "28,000 sq.ft",
+    yearBuilt: "2022",
+    status: "For Rent",
+    amenities: ["Rooftop Terrace", "Sky Gardens", "Concierge Lobby", "4-Level Car Park", "24×7 Security", "Conference Suites", "Café & Bistro"],
+    architect: "Priya Agarwal",
   },
+
+  // ── 3 ─ The Courtyard House ────────────────────────────────────────────────
   {
     id: 3,
     title: "The Courtyard House",
     location: "Alibaug, India",
     category: "Residential",
     image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&h=700&fit=crop&auto=format",
+    gallery: [
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&h=750&fit=crop&auto=format",
+    ],
+    panoramaImage: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=3000&h=900&fit=crop&auto=format",
+    description:
+      "A serene weekend retreat organized around a central limestone courtyard that channels coastal breezes. The Courtyard House draws on Konkan vernacular architecture — thick walls, shaded verandas, and an outdoor bathing court — reinterpreted in a contemporary language.",
+    price: "₹3.2 Cr",
+    rent: "₹95K / month",
+    area: "3,800 sq.ft",
+    bedrooms: 4,
+    bathrooms: 4,
+    yearBuilt: "2022",
+    status: "Available",
+    amenities: ["Central Courtyard", "Swimming Pool", "Outdoor Kitchen", "Firepit Lounge", "Private Garden", "Bicycle Storage"],
+    architect: "Kabir Sharma",
   },
+
+  // ── 4 ─ Vault Arts Centre ──────────────────────────────────────────────────
   {
     id: 4,
     title: "Vault Arts Centre",
     location: "New Delhi, India",
     category: "Cultural",
     image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1200&h=700&fit=crop&auto=format",
+    gallery: [
+      "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1604754742629-3e5728249d73?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1543906965-f9520aa2ed8a?w=1200&h=750&fit=crop&auto=format",
+    ],
+    panoramaImage: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=3000&h=900&fit=crop&auto=format",
+    description:
+      "A civic landmark for contemporary arts in Lutyens' Delhi. Vault's subterranean galleries create a world beneath the city, where natural light filters through a monumental skylight grid. The building is designed for permanence — its raw concrete shell expected to outlast several generations of exhibitions.",
+    price: "Public Institution",
+    rent: "",
+    area: "45,000 sq.ft",
+    yearBuilt: "2021",
+    status: "Operational",
+    amenities: ["3 Exhibition Halls", "Performance Theatre", "Sculpture Garden", "Archive Library", "Café & Reading Room", "Artist-in-Residence Studios"],
+    architect: "Kabir Sharma & Ananya Bose",
   },
+
+  // ── 5 ─ Glass Retreat ──────────────────────────────────────────────────────
   {
     id: 5,
     title: "Glass Retreat",
     location: "Karjat, India",
     category: "Commercial",
     image: "https://images.unsplash.com/photo-1549517045-bc93de075e53?w=1200&h=700&fit=crop&auto=format",
+    gallery: [
+      "https://images.unsplash.com/photo-1549517045-bc93de075e53?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1601918774516-b0cb2cd08c10?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&h=750&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&h=750&fit=crop&auto=format",
+    ],
+    panoramaImage: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=3000&h=900&fit=crop&auto=format",
+    description:
+      "A high-altitude corporate retreat anchored in the Western Ghats. Floor-to-ceiling glass walls dissolve the boundary between boardroom and rainforest. Glass Retreat is designed for focused work — silent, distraction-free, and profoundly connected to the natural world.",
+    price: "₹6.8 Cr",
+    rent: "₹1.8L / month",
+    area: "8,500 sq.ft",
+    yearBuilt: "2023",
+    status: "Available",
+    amenities: ["360° Forest Views", "Helipad", "Outdoor Pavilion", "Spa & Wellness", "Conference Facilities", "Chef's Kitchen", "Hiking Trails"],
+    architect: "Priya Agarwal",
   },
 ];
 
-// --- Services Section ---------------------------------------------------------
+// --- Services Section --------------------------------------------------------
 
 export interface Service {
   num: string;
@@ -185,7 +276,7 @@ export const services: Service[] = [
     num: "02",
     title: "Interior Architecture",
     description:
-      "We shape spaces from the inside out � materiality, light, proportion, and detail considered as one unified composition.",
+      "We shape spaces from the inside out — materiality, light, proportion, and detail considered as one unified composition.",
     tags: ["Space Planning", "Materials", "Lighting Design", "Furniture"],
     image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=700&h=600&fit=crop&auto=format",
   },
@@ -207,20 +298,17 @@ export const services: Service[] = [
   },
 ];
 
-// --- Awards Section -----------------------------------------------------------
+// --- Awards Section ----------------------------------------------------------
 
 export const awardsSection = {
   label: "Recognition",
   headingLine1: "Awards &",
   headingGold: "Honours",
-
   quote: {
     text: '"Architecture is not about buildings. It is about people and how they inhabit space."',
-    attribution: "� Kabir Sharma, Founder",
+    attribution: "— Kabir Sharma, Founder",
   },
-
   badgeYears: 17,
-
   images: {
     top: {
       src: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=700&h=420&fit=crop&auto=format",
@@ -245,10 +333,10 @@ export const awards: Award[] = [
   { name: "Architectural Review Award",       year: "2021", category: "Cultural"    },
   { name: "RIBA International Prize",         year: "2020", category: "Commercial"  },
   { name: "World Architecture Festival",      year: "2019", category: "Urban"       },
-  { name: "AZ Award � Best New Global Voice", year: "2018", category: "Emerging"   },
+  { name: "AZ Award — Best New Global Voice", year: "2018", category: "Emerging"   },
 ];
 
-// --- Testimonials Section -----------------------------------------------------
+// --- Testimonials Section ----------------------------------------------------
 
 export interface Testimonial {
   quote: string;
@@ -262,7 +350,7 @@ export interface Testimonial {
 export const testimonials: Testimonial[] = [
   {
     quote:
-      "Optik transformed our brief into something we never could have imagined ourselves � a home that feels both extraordinary and completely natural to live in.",
+      "Optik transformed our brief into something we never could have imagined ourselves — a home that feels both extraordinary and completely natural to live in.",
     name: "Ananya Sen",
     role: "Private Residential Client (Goa)",
     rating: 5,
@@ -289,14 +377,13 @@ export const testimonials: Testimonial[] = [
   },
 ];
 
-// --- Insights / Journal Section -----------------------------------------------
+// --- Insights / Journal Section ----------------------------------------------
 
 export const insightsSection = {
   label: "Ideas & Writing",
   headingLine1: "Latest Thought",
   headingLine2: "from the",
   headingGold: "Studio",
-
   bannerImage: {
     src: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=300&fit=crop&auto=format",
     alt: "Studio insights",
@@ -335,7 +422,7 @@ export const posts: Post[] = [
   },
 ];
 
-// --- Footer -------------------------------------------------------------------
+// --- Footer ------------------------------------------------------------------
 
 export const footer = {
   bgImage: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1400&h=600&fit=crop&auto=format",

@@ -3,13 +3,15 @@ import {
   MapPin, ArrowUpRight, ArrowRight, Star,
   ChevronLeft, ChevronRight, Phone, Menu, X,
   ChevronDown, ArrowUp,
+  Compass, ZoomIn, ZoomOut, Calendar, User,
+  Ruler, Bed, Bath, Tag, DollarSign, Check,
 } from "lucide-react";
 import {
   brand, navLinks, contact, socialLinks,
   hero as heroContent,
   clientLogos,
   about as aboutContent,
-  portfolioFilters, projects,
+  portfolioFilters, projects, Project,
   services,
   awardsSection, awards,
   testimonials,
@@ -72,6 +74,23 @@ const GLOBAL_CSS = `
   .rv-3d { perspective: 1000px; }
   .rv-3d-child { opacity: 0; transform: rotateX(25deg) translateY(60px); transition: opacity 1.3s cubic-bezier(.16,1,.3,1), transform 1.3s cubic-bezier(.16,1,.3,1); }
   .rv-3d-child.on { opacity: 1; transform: rotateX(0deg) translateY(0); }
+
+  /* ── Project Modal ─────────────────────────────────────────── */
+  @keyframes modalBackdropIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes modalPanelIn    { from { opacity:0; transform:translateY(40px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+  @keyframes thumbPop        { 0%{transform:scale(1)} 40%{transform:scale(1.12)} 100%{transform:scale(1)} }
+  @keyframes shimmerGold     { from{background-position:-200% 0} to{background-position:200% 0} }
+  @keyframes statusPulse     { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+  .modal-backdrop { animation: modalBackdropIn .28s ease forwards; }
+  .modal-panel    { animation: modalPanelIn   .45s cubic-bezier(.16,1,.3,1) forwards; }
+  .thumb-active   { animation: thumbPop .3s ease; }
+
+  .amenity-chip:hover { background: rgba(201,169,110,.18) !important; border-color: #C9A96E !important; color: #C9A96E !important; }
+  .modal-tab-btn { transition: all .25s ease; }
+  .modal-tab-btn:hover { opacity: .8; }
+
+  .gallery-img-enter { animation: modalPanelIn .35s cubic-bezier(.16,1,.3,1); }
 `;
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
@@ -488,8 +507,480 @@ function About() {
   );
 }
 
+// ─── Portfolio Modal Viewers ──────────────────────────────────────────────────
+
+function GalleryViewer({ images }: { images: string[] }) {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const nextImage = useCallback(() => {
+    setActiveIndex(prev => (prev + 1) % images.length);
+  }, [images.length]);
+
+  const prevImage = useCallback(() => {
+    setActiveIndex(prev => (prev - 1 + images.length) % images.length);
+  }, [images.length]);
+
+  // Support keyboard navigation within gallery
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") nextImage();
+      if (e.key === "ArrowLeft") prevImage();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [nextImage, prevImage]);
+
+  if (!images || images.length === 0) return null;
+
+  return (
+    <div className="w-full h-full flex flex-col justify-between bg-neutral-950 relative select-none">
+      {/* Main Image View */}
+      <div className="flex-1 w-full relative overflow-hidden flex items-center justify-center bg-black">
+        <img
+          key={activeIndex}
+          src={images[activeIndex]}
+          alt={`Gallery View ${activeIndex + 1}`}
+          className="w-full h-full object-cover gallery-img-enter transition-all duration-500"
+        />
+
+        {/* Left/Right Arrows */}
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={prevImage}
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-[#C9A96E] text-white hover:text-black flex items-center justify-center border border-white/10 hover:border-[#C9A96E] transition-all hover:scale-110 active:scale-95 cursor-pointer z-10"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <button
+              onClick={nextImage}
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-[#C9A96E] text-white hover:text-black flex items-center justify-center border border-white/10 hover:border-[#C9A96E] transition-all hover:scale-110 active:scale-95 cursor-pointer z-10"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </>
+        )}
+
+        {/* Counter Badge */}
+        <div className="absolute top-4 right-4 bg-black/75 px-3 py-1 rounded text-[10px] font-mono text-white/80 tracking-widest uppercase border border-white/5">
+          {activeIndex + 1} / {images.length}
+        </div>
+      </div>
+
+      {/* Thumbnail Nav Bar */}
+      {images.length > 1 && (
+        <div className="h-20 bg-[#0d0d0d] flex items-center gap-2.5 px-4 overflow-x-auto border-t border-white/10 scrollbar-none">
+          {images.map((img, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveIndex(i)}
+              className="relative flex-shrink-0 h-12 w-18 overflow-hidden rounded-sm transition-all duration-300 cursor-pointer"
+              style={{
+                border: `1.5px solid ${i === activeIndex ? GOLD : "transparent"}`,
+                opacity: i === activeIndex ? 1 : 0.4,
+              }}
+            >
+              <img src={img} alt={`Thumb ${i}`} className="w-full h-full object-cover pointer-events-none" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PanoramaViewer({ image }: { image: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [zoom, setZoom] = useState(1);
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [isAutoPanning, setIsAutoPanning] = useState(true);
+
+  // Auto-pan loop with ping-pong effect
+  useEffect(() => {
+    let frameId: number;
+    const speed = 0.45; // Auto pan speed
+    let direction = 1;
+
+    const pan = () => {
+      const container = containerRef.current;
+      if (container && isAutoPanning && !isDragging) {
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        if (maxScroll > 0) {
+          let nextScroll = container.scrollLeft + speed * direction;
+          if (nextScroll >= maxScroll) {
+            direction = -1;
+            nextScroll = maxScroll;
+          } else if (nextScroll <= 0) {
+            direction = 1;
+            nextScroll = 0;
+          }
+          container.scrollLeft = nextScroll;
+        }
+      }
+      frameId = requestAnimationFrame(pan);
+    };
+
+    frameId = requestAnimationFrame(pan);
+    return () => cancelAnimationFrame(frameId);
+  }, [isAutoPanning, isDragging]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const container = containerRef.current;
+    if (!container) return;
+    setIsDragging(true);
+    setIsAutoPanning(false);
+    setHasInteracted(true);
+    setStartX(e.pageX - container.offsetLeft);
+    setScrollLeft(container.scrollLeft);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const container = containerRef.current;
+    if (!container) return;
+    const x = e.pageX - container.offsetLeft;
+    const walk = (x - startX) * 1.6; // multiplier for speed
+    container.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUpOrLeave = () => {
+    setIsDragging(false);
+    // Resume auto-pan after 2.5 seconds of idle
+    const timer = setTimeout(() => {
+      setIsAutoPanning(true);
+    }, 2500);
+    return () => clearTimeout(timer);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const container = containerRef.current;
+    if (!container) return;
+    setIsDragging(true);
+    setIsAutoPanning(false);
+    setHasInteracted(true);
+    setStartX(e.touches[0].pageX - container.offsetLeft);
+    setScrollLeft(container.scrollLeft);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const x = e.touches[0].pageX - container.offsetLeft;
+    const walk = (x - startX) * 1.6;
+    container.scrollLeft = scrollLeft - walk;
+  };
+
+  return (
+    <div className="relative w-full h-full overflow-hidden bg-neutral-950 flex flex-col justify-between select-none">
+      {/* Scroll View Area */}
+      <div
+        ref={containerRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUpOrLeave}
+        onMouseLeave={handleMouseUpOrLeave}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleMouseUpOrLeave}
+        className="w-full flex-1 overflow-x-hidden relative cursor-grab active:cursor-grabbing"
+      >
+        <img
+          src={image}
+          alt="360 Panorama View"
+          style={{
+            transform: `scale(${zoom})`,
+            transformOrigin: "center center",
+            transition: isDragging ? "none" : "transform 0.25s ease-out",
+          }}
+          className="h-full max-w-none min-w-[320%] object-cover pointer-events-none"
+        />
+
+        {/* Drag Prompt Overlay */}
+        {!hasInteracted && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/45 pointer-events-none transition-opacity duration-700">
+            <div className="w-14 h-14 rounded-full border border-[#C9A96E]/50 flex items-center justify-center bg-black/30 mb-3 animate-pulse">
+              <Compass className="text-[#C9A96E] animate-spin-slow" size={26} />
+            </div>
+            <p className="text-white text-[11px] tracking-[0.25em] font-semibold uppercase text-center px-6">
+              Drag left or right to explore 360° space
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Control Buttons Overlay */}
+      <div className="absolute bottom-4 right-4 flex items-center gap-3 bg-black/70 backdrop-blur-md px-3.5 py-2 rounded-sm border border-white/10 z-10">
+        <button
+          onClick={() => setZoom(prev => Math.max(1, prev - 0.25))}
+          disabled={zoom <= 1}
+          className="text-white/80 hover:text-[#C9A96E] disabled:opacity-30 disabled:hover:text-white/80 transition-colors cursor-pointer"
+        >
+          <ZoomOut size={15} />
+        </button>
+        <span className="text-[9px] font-mono text-white/50 tracking-wider uppercase">Scale: {zoom.toFixed(2)}x</span>
+        <button
+          onClick={() => setZoom(prev => Math.min(2.5, prev + 0.25))}
+          disabled={zoom >= 2.5}
+          className="text-white/80 hover:text-[#C9A96E] disabled:opacity-30 disabled:hover:text-white/80 transition-colors cursor-pointer"
+        >
+          <ZoomIn size={15} />
+        </button>
+      </div>
+
+      {/* Badge */}
+      <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-[#C9A96E] text-black px-3 py-1 rounded-sm text-[9px] font-bold tracking-widest uppercase shadow-md animate-pulse">
+        <Compass size={11} className="animate-spin-slow" />
+        Interactive 360°
+      </div>
+    </div>
+  );
+}
+
+function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
+  const [activeTab, setActiveTab] = useState<"gallery" | "360">("gallery");
+
+  // Prevent background scroll
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
+  // Escape key support
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  console.log("Rendering ProjectModal component for:", project.title);
+
+  return (
+    <div
+      onClick={handleBackdropClick}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md modal-backdrop"
+    >
+      <div className="relative w-full max-w-6xl h-[90vh] md:h-[80vh] bg-[#0D0D0D] border border-white/10 rounded-sm shadow-2xl overflow-hidden flex flex-col md:flex-row modal-panel">
+        
+        {/* Left Side: Media Panel */}
+        <div className="w-full md:w-[60%] h-[320px] md:h-full relative bg-[#121212] flex flex-col border-b md:border-b-0 md:border-r border-white/10">
+          
+          {/* Media Select Tabs (Overlaid) */}
+          <div className="absolute top-4 left-4 z-20 flex gap-1.5 bg-black/75 backdrop-blur-md p-1 rounded-sm border border-white/10">
+            <button
+              onClick={() => setActiveTab("gallery")}
+              className={`px-3 py-1.5 rounded-sm text-[9px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
+                activeTab === "gallery" ? "bg-[#C9A96E] text-black" : "text-white/60 hover:text-white"
+              }`}
+            >
+              Gallery
+            </button>
+            {project.panoramaImage && (
+              <button
+                onClick={() => setActiveTab("360")}
+                className={`px-3 py-1.5 rounded-sm text-[9px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
+                  activeTab === "360" ? "bg-[#C9A96E] text-black" : "text-white/60 hover:text-white"
+                }`}
+              >
+                360° View
+              </button>
+            )}
+          </div>
+
+          {/* Close button (Absolute overlay, works everywhere) */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-30 w-8 h-8 rounded-sm bg-black/75 hover:bg-[#C9A96E] text-white hover:text-black flex items-center justify-center border border-white/10 hover:border-[#C9A96E] transition-all hover:scale-105 active:scale-95 cursor-pointer"
+          >
+            <X size={16} />
+          </button>
+
+          {/* Media Content */}
+          <div className="flex-1 w-full h-full overflow-hidden">
+            {activeTab === "gallery" ? (
+              <GalleryViewer images={project.gallery && project.gallery.length > 0 ? project.gallery : [project.image]} />
+            ) : (
+              <PanoramaViewer image={project.panoramaImage} />
+            )}
+          </div>
+        </div>
+
+        {/* Right Side: Details Panel */}
+        <div className="w-full md:w-[40%] h-[calc(100%-320px)] md:h-full overflow-y-auto p-6 md:p-10 flex flex-col justify-between bg-[#0D0D0D]">
+          
+          <div className="flex-1">
+            {/* Category Breadcrumb */}
+            <div className="flex items-center gap-1.5 mb-2.5">
+              <span className="w-1.5 h-1.5 bg-[#C9A96E]" />
+              <span style={{ fontFamily: FONT_BODY, color: GOLD, fontSize: "9px", letterSpacing: "0.2em" }} className="uppercase font-bold">
+                {project.category}
+              </span>
+            </div>
+
+            {/* Title */}
+            <h2
+              style={{ fontFamily: FONT_BODY, color: "#fff", fontSize: "1.8rem", letterSpacing: "0.02em", lineHeight: 1.15 }}
+              className="font-extrabold uppercase mb-2"
+            >
+              {project.title}
+            </h2>
+
+            {/* Location */}
+            <div className="flex items-center gap-2 mb-6">
+              <MapPin size={12} style={{ color: GOLD }} />
+              <span style={{ fontFamily: FONT_BODY, color: "rgba(255,255,255,0.55)", fontSize: "11px", letterSpacing: "0.05em" }}>
+                {project.location}
+              </span>
+            </div>
+
+            {/* Divider */}
+            <div className="w-12 h-[1px] bg-[#C9A96E] mb-6" />
+
+            {/* Description */}
+            <p
+              style={{ fontFamily: FONT_BODY, fontSize: "13px", lineHeight: 1.7 }}
+              className="text-white/70 font-light mb-8 text-justify"
+            >
+              {project.description}
+            </p>
+
+            {/* Specifications Grid */}
+            <div className="grid grid-cols-2 gap-3 mb-8">
+              {/* Price */}
+              {project.price && (
+                <div className="bg-white/5 border border-white/5 p-3 rounded-sm flex flex-col justify-between hover:border-[#C9A96E]/20 transition-all duration-300">
+                  <span className="text-[9px] text-white/40 tracking-wider uppercase font-semibold block mb-1">Price</span>
+                  <span style={{ color: GOLD }} className="text-xs font-bold font-mono tracking-wide">
+                    {project.price}
+                  </span>
+                </div>
+              )}
+
+              {/* Rent */}
+              {project.rent && (
+                <div className="bg-white/5 border border-white/5 p-3 rounded-sm flex flex-col justify-between hover:border-[#C9A96E]/20 transition-all duration-300">
+                  <span className="text-[9px] text-white/40 tracking-wider uppercase font-semibold block mb-1">Rent</span>
+                  <span style={{ color: GOLD }} className="text-xs font-bold font-mono tracking-wide">
+                    {project.rent}
+                  </span>
+                </div>
+              )}
+
+              {/* Area */}
+              {project.area && (
+                <div className="bg-white/5 border border-white/5 p-3 rounded-sm flex flex-col justify-between hover:border-[#C9A96E]/20 transition-all duration-300">
+                  <span className="text-[9px] text-white/40 tracking-wider uppercase font-semibold block mb-1">Total Area</span>
+                  <span className="text-xs font-bold text-white font-mono flex items-center gap-1">
+                    <Ruler size={11} className="text-[#C9A96E]/80" /> {project.area}
+                  </span>
+                </div>
+              )}
+
+              {/* Status */}
+              {project.status && (
+                <div className="bg-white/5 border border-white/5 p-3 rounded-sm flex flex-col justify-between hover:border-[#C9A96E]/20 transition-all duration-300">
+                  <span className="text-[9px] text-white/40 tracking-wider uppercase font-semibold block mb-1">Status</span>
+                  <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span className={`w-1.5 h-1.5 rounded-full ${project.status === "Available" || project.status === "Operational" ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`} />
+                    {project.status}
+                  </span>
+                </div>
+              )}
+
+              {/* Year Built */}
+              {project.yearBuilt && (
+                <div className="bg-white/5 border border-white/5 p-3 rounded-sm flex flex-col justify-between hover:border-[#C9A96E]/20 transition-all duration-300">
+                  <span className="text-[9px] text-white/40 tracking-wider uppercase font-semibold block mb-1">Completed</span>
+                  <span className="text-xs font-bold text-white flex items-center gap-1">
+                    <Calendar size={11} className="text-[#C9A96E]/80" /> {project.yearBuilt}
+                  </span>
+                </div>
+              )}
+
+              {/* Architect */}
+              {project.architect && (
+                <div className="bg-white/5 border border-white/5 p-3 rounded-sm flex flex-col justify-between hover:border-[#C9A96E]/20 transition-all duration-300 col-span-1">
+                  <span className="text-[9px] text-white/40 tracking-wider uppercase font-semibold block mb-1">Architect</span>
+                  <span className="text-xs font-bold text-white truncate flex items-center gap-1">
+                    <User size={11} className="text-[#C9A96E]/80" /> {project.architect}
+                  </span>
+                </div>
+              )}
+
+              {/* Bedrooms & Bathrooms (If applicable) */}
+              {(project.bedrooms || project.bathrooms) && (
+                <div className="bg-white/5 border border-white/5 p-3 rounded-sm flex flex-col justify-between hover:border-[#C9A96E]/20 transition-all duration-300 col-span-2">
+                  <span className="text-[9px] text-white/40 tracking-wider uppercase font-semibold block mb-1">Configuration</span>
+                  <span className="text-xs font-bold text-white flex items-center gap-4">
+                    {project.bedrooms && (
+                      <span className="flex items-center gap-1.5">
+                        <Bed size={12} className="text-[#C9A96E]" /> {project.bedrooms} Bedrooms
+                      </span>
+                    )}
+                    {project.bathrooms && (
+                      <span className="flex items-center gap-1.5">
+                        <Bath size={12} className="text-[#C9A96E]" /> {project.bathrooms} Bathrooms
+                      </span>
+                    )}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Amenities Section */}
+            {project.amenities && project.amenities.length > 0 && (
+              <div className="mb-8">
+                <span className="text-[9px] text-[#C9A96E] tracking-[0.2em] uppercase font-bold block mb-3">Premium Amenities</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {project.amenities.map(amenity => (
+                    <span
+                      key={amenity}
+                      className="bg-white/5 border border-white/5 rounded-sm px-2.5 py-1 text-[10px] text-white/80 hover:bg-[#C9A96E]/10 hover:border-[#C9A96E]/30 hover:text-[#C9A96E] transition-all duration-300 cursor-default flex items-center gap-1"
+                    >
+                      <Check size={8} className="text-[#C9A96E]" /> {amenity}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Inquiry CTA */}
+          <button
+            style={{
+              fontFamily: FONT_BODY,
+              letterSpacing: "0.2em",
+              border: `1.5px solid ${GOLD}`,
+              background: GOLD,
+              color: DARK,
+            }}
+            className="w-full py-3.5 text-center text-[10px] font-bold uppercase transition-all duration-300 hover:bg-transparent hover:text-white cursor-pointer rounded-sm"
+          >
+            Request Private Viewing
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 // ─── Portfolio ────────────────────────────────────────────────────────────────
-function Portfolio() {
+function Portfolio({ onSelectProject }: { onSelectProject: (project: Project) => void }) {
   const [filter, setFilter] = useState("All");
   const { ref, on } = useReveal(0.1);
   const filtered = filter === "All" ? projects : projects.filter(p => p.category === filter);
@@ -544,7 +1035,8 @@ function Portfolio() {
                                  border:`1px solid ${GOLD}`, padding:"0.3rem 1rem" }} className="uppercase">
                     {p.category}
                   </span>
-                  <a href="#" style={{ fontFamily:FONT_DISPLAY, color:"#fff", fontSize:"1.1rem", letterSpacing:"0.1em" }}
+                  <a href="#" onClick={(e) => { e.preventDefault(); console.log("Clicked View Project:", p.title); onSelectProject(p); }}
+                     style={{ fontFamily:FONT_DISPLAY, color:"#fff", fontSize:"1.1rem", letterSpacing:"0.1em" }}
                      className="flex items-center gap-2 hover:opacity-70 transition-opacity">
                     View Project <ArrowUpRight size={16} />
                   </a>
@@ -559,7 +1051,8 @@ function Portfolio() {
                   <h3 style={{ fontFamily:FONT_BODY, color:DARK, fontWeight:700, fontSize:"13px", letterSpacing:"0.05em", textTransform:"uppercase" }}>{p.title}</h3>
                   <span style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"10px", letterSpacing:"0.15em" }} className="uppercase mt-1 block">{p.category}</span>
                 </div>
-                <a href="#" style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"10px", fontWeight:700, letterSpacing:"0.15em" }}
+                <a href="#" onClick={(e) => { e.preventDefault(); console.log("Clicked See Project:", p.title); onSelectProject(p); }}
+                   style={{ fontFamily:FONT_BODY, color:GOLD, fontSize:"10px", fontWeight:700, letterSpacing:"0.15em" }}
                    className="hl uppercase hover:opacity-60 transition-opacity">See Project</a>
               </div>
             </div>
@@ -1073,6 +1566,7 @@ function Footer() {
 // ─── App ──────────────────────────────────────────────────────────────────────
 export default function App() {
   const [open, setOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   return (
     <div style={{ fontFamily: FONT_BODY }}>
       <style>{GLOBAL_CSS}</style>
@@ -1080,12 +1574,15 @@ export default function App() {
       <Hero />
       <ClientLogos />
       <About />
-      <Portfolio />
+      <Portfolio onSelectProject={setSelectedProject} />
       <Services />
       <Awards />
       <Testimonials />
       <Insights />
       <Footer />
+      {selectedProject && (
+        <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+      )}
     </div>
   );
 }
